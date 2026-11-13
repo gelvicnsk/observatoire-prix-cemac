@@ -75,7 +75,7 @@ Résultat de l'inventaire du 13 novembre 2026 (`make profile`). « Actif » = de
 
 - **Prix mensuels par marché** : 4 pays actifs, plus l'historique du Gabon.
 - **Indicateurs nationaux annuels** (inflation, population) : les 6 pays, y compris la Guinée équatoriale.
-- **Pluviométrie par district** (CHIRPS) : les 6 pays, depuis 1981. Les marchés sont rattachés à leur district à l'étape 5.
+- **Pluviométrie par district** (CHIRPS) : 5 pays depuis 1981 (aucun jeu publié pour le Gabon). Les marchés sont rattachés à leur district à l'étape 5.
 
 **Monnaie.** Les 6 pays utilisent le franc CFA d'Afrique centrale (XAF), à parité fixe avec l'euro.
 Toutes les lignes du PAM sont en XAF. Les prix sont gardés en XAF et convertis en EUR et en USD pour comparer.

@@ -12,7 +12,7 @@ les hausses de prix aux déficits de pluie. Deux options :
 | Lieu | point exact du marché | district (admin2) |
 | Historique | 1940 → aujourd'hui | 1981 → aujourd'hui, par décade |
 | Normale et anomalie | à calculer | déjà calculées (référence 1989-2018) |
-| Pays couverts | tous | les 6, dont la Guinée équatoriale |
+| Pays couverts | tous | 5 sur 6 (pas le Gabon), dont la Guinée équatoriale |
 | Coût d'accès | appels pondérés par la durée : ~200 marchés × 23 ans dépassent la limite gratuite de 10 000 appels/jour | 1 fichier par pays, même client que les prix |
 | Référence métier | réanalyse météo générale | jeu de référence des systèmes d'alerte de sécurité alimentaire |
 
