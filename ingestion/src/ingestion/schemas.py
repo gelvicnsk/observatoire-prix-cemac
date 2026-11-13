@@ -71,6 +71,45 @@ FX_SCHEMA = pa.schema(
     ]
 )
 
+RAINFALL_SCHEMA = pa.schema(
+    [
+        pa.field("date", pa.date32(), nullable=False),  # début de la décade (1, 11 ou 21 du mois)
+        pa.field("country_iso3", pa.string(), nullable=False),
+        pa.field("pcode", pa.string(), nullable=False),  # code du district (admin2)
+        pa.field("adm2_id", pa.string()),
+        pa.field("n_pixels", pa.float64()),
+        pa.field("rfh", pa.float64()),  # pluie de la décade (mm)
+        pa.field("rfh_avg", pa.float64()),  # moyenne de long terme de la décade (mm)
+        pa.field("r1h", pa.float64()),  # cumul glissant sur 1 mois (mm)
+        pa.field("r1h_avg", pa.float64()),
+        pa.field("r3h", pa.float64()),  # cumul glissant sur 3 mois (mm)
+        pa.field("r3h_avg", pa.float64()),
+        pa.field("rfq", pa.float64()),  # anomalie de la décade (%)
+        pa.field("r1q", pa.float64()),  # anomalie sur 1 mois (%)
+        pa.field("r3q", pa.float64()),  # anomalie sur 3 mois (%)
+        pa.field("version", pa.string()),
+        *LINEAGE_FIELDS,
+    ]
+)
+
+# Les fichiers ont changé de nommage selon les versions : on accepte chaque variante connue
+RAINFALL_ALIASES: dict[str, tuple[str, ...]] = {
+    "pcode": ("pcode", "adm2_pcode", "adm_pcode"),
+    "adm2_id": ("adm2_id", "adm_id"),
+    "n_pixels": ("n_pixels",),
+    "rfh": ("rfh",),
+    "rfh_avg": ("rfh_avg", "rfh_lta"),
+    "r1h": ("r1h",),
+    "r1h_avg": ("r1h_avg", "r1h_lta"),
+    "r3h": ("r3h",),
+    "r3h_avg": ("r3h_avg", "r3h_lta"),
+    "rfq": ("rfq",),
+    "r1q": ("r1q",),
+    "r3q": ("r3q",),
+    "version": ("version",),
+}
+RAINFALL_REQUIRED = ("date", "pcode", "rfh")
+
 
 class SchemaError(ValueError):
     """Le fichier source ne respecte pas le contrat attendu."""
@@ -191,6 +230,41 @@ def fx_to_table(frame: pd.DataFrame, sha256: str, ingested_at: datetime, run_id:
         **_lineage(len(frame), sha256, ingested_at, run_id),
     }
     return pa.Table.from_pydict(data, schema=FX_SCHEMA)
+
+
+def rainfall_to_table(frame: pd.DataFrame, iso3: str, sha256: str, ingested_at: datetime, run_id: str) -> pa.Table:
+    resolved = {
+        target: next((alias for alias in aliases if alias in frame.columns), None)
+        for target, aliases in RAINFALL_ALIASES.items()
+    }
+    resolved["date"] = "date" if "date" in frame.columns else None
+    missing = [name for name in RAINFALL_REQUIRED if resolved.get(name) is None]
+    if missing:
+        raise SchemaError(
+            f"colonnes attendues absentes : {', '.join(missing)} ; colonnes trouvées : {', '.join(frame.columns)}"
+        )
+
+    dates = pd.to_datetime(frame["date"].str.strip(), format="%Y-%m-%d", errors="coerce")
+    _fail_if_any(dates.isna(), frame["date"], "date", "date(s) illisible(s)")
+    pcode_column = resolved["pcode"]
+    _fail_if_any(frame[pcode_column].str.strip() == "", frame[pcode_column], pcode_column, "code(s) vide(s)")
+
+    def column(target: str, kind: str) -> list:
+        source = resolved[target]
+        if source is None:
+            return [None] * len(frame)
+        return _floats(frame[source], source) if kind == "float" else _text(frame[source])
+
+    data = {
+        "date": [d.date() for d in dates],
+        "country_iso3": [iso3] * len(frame),
+        "pcode": column("pcode", "text"),
+        "adm2_id": column("adm2_id", "text"),
+        **{name: column(name, "float") for name in RAINFALL_SCHEMA.names[4:14]},
+        "version": column("version", "text"),
+        **_lineage(len(frame), sha256, ingested_at, run_id),
+    }
+    return pa.Table.from_pydict(data, schema=RAINFALL_SCHEMA)
 
 
 def to_parquet_bytes(table: pa.Table) -> bytes:

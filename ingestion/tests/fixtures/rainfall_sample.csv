@@ -1,0 +1,5 @@
+date,adm2_id,ADM2_PCODE,n_pixels,rfh,rfh_lta,r1h,r1h_lta,r3h,r3h_lta,rfq,r1q,r3q,version
+#date,#adm2+id,#adm2+code,#indicator+n_pixels,#indicator+rfh+num,#indicator+rfh_avg+num,#indicator+r1h+num,#indicator+r1h_avg+num,#indicator+r3h+num,#indicator+r3h_avg+num,#indicator+rfq+pct,#indicator+r1q+pct,#indicator+r3q+pct,#status
+2026-09-01,1201,CG0101,42,61.5,55.0,180.2,170.1,410.0,400.3,111.8,105.9,102.4,final
+2026-09-11,1201,CG0101,42,20.0,58.0,150.1,171.2,380.0,402.0,34.5,87.7,94.5,final
+2026-09-21,1202,CG0102,15,,57.1,,,,,,,,forecast

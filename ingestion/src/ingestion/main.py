@@ -22,10 +22,10 @@ from ingestion.config import CEMAC_COUNTRIES, HTTP_USER_AGENT, Settings
 from ingestion.hdx import HdxClient
 from ingestion.meta import BigQueryMeta, LocalMeta
 from ingestion.pipeline import Outcome, fail, process
-from ingestion.sources import exchange_rates, hdx_wfp, world_bank
+from ingestion.sources import exchange_rates, hdx_rainfall, hdx_wfp, world_bank
 from ingestion.storage import GcsStore, LocalStore
 
-ALL_SOURCES = ("wfp", "world_bank", "fx")
+ALL_SOURCES = ("wfp", "rainfall", "world_bank", "fx")
 
 
 def build_http() -> httpx.Client:
@@ -61,6 +61,9 @@ def run(
     if "wfp" in sources:
         for iso3 in countries:
             attempt("wfp", f"country={iso3}", lambda iso3=iso3: hdx_wfp.fetch(hdx, iso3))
+    if "rainfall" in sources:
+        for iso3 in countries:
+            attempt("rainfall", f"country={iso3}", lambda iso3=iso3: hdx_rainfall.fetch(hdx, iso3))
     if "world_bank" in sources:
         for indicator in world_bank.INDICATORS:
             attempt(

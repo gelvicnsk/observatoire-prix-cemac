@@ -75,3 +75,23 @@ def test_fx_monthly_rates():
 def test_parquet_round_trip():
     table = wfp_to_table(clean_wfp(), "COG", "a" * 64, NOW, "run1")
     assert len(to_parquet_bytes(table)) > 0
+
+
+def test_rainfall_accepts_lta_column_names_and_empty_values():
+    from ingestion.schemas import rainfall_to_table
+
+    frame = read_csv_as_text(FIXTURES / "rainfall_sample.csv")
+    table = rainfall_to_table(frame, "COG", "d" * 64, NOW, "run1")
+    assert table.num_rows == 3  # la ligne de balises HXL est retirée
+    assert table.column("pcode")[0].as_py() == "CG0101"
+    assert table.column("rfh_avg")[0].as_py() == 55.0  # rfh_lta lu sous le nom rfh_avg
+    assert table.column("rfh")[2].as_py() is None  # décade sans donnée : nulle, pas zéro
+    assert table.column("date")[1].as_py() == date(2026, 9, 11)
+
+
+def test_rainfall_missing_code_column_lists_found_columns():
+    from ingestion.schemas import rainfall_to_table
+
+    frame = read_csv_as_text(FIXTURES / "rainfall_sample.csv").drop(columns=["adm2_pcode"])
+    with pytest.raises(SchemaError, match="colonnes trouvées"):
+        rainfall_to_table(frame, "COG", "d" * 64, NOW, "run1")

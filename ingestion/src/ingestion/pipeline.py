@@ -17,7 +17,13 @@ import pyarrow as pa
 
 from ingestion.meta import LoadLogEntry, MetaStore, ProcessedFile
 from ingestion.profiling import read_csv_as_text
-from ingestion.schemas import fx_to_table, to_parquet_bytes, wfp_to_table, world_bank_to_table
+from ingestion.schemas import (
+    fx_to_table,
+    rainfall_to_table,
+    to_parquet_bytes,
+    wfp_to_table,
+    world_bank_to_table,
+)
 from ingestion.sources import RawFile
 
 CONTENT_TYPES = {"csv": "text/csv", "json": "application/json"}
@@ -42,6 +48,9 @@ def parse(raw: RawFile, sha256: str, ingested_at: datetime, run_id: str) -> pa.T
         return wfp_to_table(frame, raw.partitions["country"], sha256, ingested_at, run_id)
     if raw.source == "world_bank":
         return world_bank_to_table(json.loads(raw.content), sha256, ingested_at, run_id)
+    if raw.source == "rainfall":
+        frame = read_csv_as_text(raw.content)
+        return rainfall_to_table(frame, raw.partitions["country"], sha256, ingested_at, run_id)
     if raw.source == "fx":
         frame = read_csv_as_text(raw.content)
         return fx_to_table(frame, sha256, ingested_at, run_id)

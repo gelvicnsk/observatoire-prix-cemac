@@ -10,10 +10,16 @@ from __future__ import annotations
 PARTITIONS: dict[str, list[tuple[str, str]]] = {
     "wfp": [("country", "STRING"), ("ingest_date", "DATE")],
     "world_bank": [("indicator", "STRING"), ("ingest_date", "DATE")],
+    "rainfall": [("country", "STRING"), ("ingest_date", "DATE")],
     "fx": [("ingest_date", "DATE")],
 }
 
-TABLE_NAMES = {"wfp": "wfp_prices", "world_bank": "world_bank_indicators", "fx": "fx_eur_usd"}
+TABLE_NAMES = {
+    "wfp": "wfp_prices",
+    "world_bank": "world_bank_indicators",
+    "rainfall": "rainfall_adm2",
+    "fx": "fx_eur_usd",
+}
 
 
 def external_table_ddl(project: str, bucket: str, source: str, dataset: str = "bronze") -> str:
