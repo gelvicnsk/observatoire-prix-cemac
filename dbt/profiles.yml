@@ -1,5 +1,8 @@
-# Authentification par le compte de service courant (gcloud en local,
-# Workload Identity Federation dans la CI, compte du job dans Cloud Run) : aucune clé.
+# Authentification sans clé : identifiants par défaut de l'environnement
+#   - en local : gcloud auth application-default login
+#   - dans GitHub Actions : Workload Identity Federation
+#   - dans Cloud Run : le compte de service du job (sa-dbt)
+# Le projet vient de GCP_PROJECT_ID (fichier .env, exporté par le Makefile).
 observatoire_cemac:
   target: dev
   outputs:
@@ -7,23 +10,29 @@ observatoire_cemac:
       type: bigquery
       method: oauth
       project: "{{ env_var('GCP_PROJECT_ID') }}"
-      dataset: dev
+      dataset: silver
       location: "{{ env_var('BQ_LOCATION', 'EU') }}"
       threads: 4
-      maximum_bytes_billed: 1000000000
+      priority: interactive
+      job_execution_timeout_seconds: 300
+      maximum_bytes_billed: 1000000000   # 1 Go par requête : garde-fou contre une requête qui exploserait
     ci:
       type: bigquery
       method: oauth
       project: "{{ env_var('GCP_PROJECT_ID') }}"
-      dataset: ci
+      dataset: ci                         # la CI écrit tout dans ci (tables effacées après 7 jours)
       location: "{{ env_var('BQ_LOCATION', 'EU') }}"
       threads: 4
+      priority: interactive
+      job_execution_timeout_seconds: 300
       maximum_bytes_billed: 1000000000
     prod:
       type: bigquery
       method: oauth
       project: "{{ env_var('GCP_PROJECT_ID') }}"
-      dataset: prod
+      dataset: silver
       location: "{{ env_var('BQ_LOCATION', 'EU') }}"
       threads: 4
+      priority: batch
+      job_execution_timeout_seconds: 600
       maximum_bytes_billed: 5000000000

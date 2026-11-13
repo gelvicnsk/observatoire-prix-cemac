@@ -1,16 +1,22 @@
 # Point d'entrée unique du projet.
 SHELL := /bin/bash
 export PATH := $(CURDIR)/.venv/bin:$(PATH)
+# Variables du fichier .env (GCP_PROJECT_ID, BQ_LOCATION…) transmises aux commandes, dont dbt
+-include .env
+export
+DBT_PROJECT_DIR := $(CURDIR)/dbt
+DBT_PROFILES_DIR := $(CURDIR)/dbt
+DBT := dbt
 ENV ?= dev
 MONTH ?= $(shell date -d "last month" +%Y-%m)
 
-.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run backfill dbt-build
+.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run backfill dbt-deps dbt-build dbt-freshness dbt-docs
 
 help:
 	@grep -E '^[a-z-]+:' Makefile | cut -d: -f1
 
 install:            ## environnement Python local
-	python3 -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
+	python3 -m venv .venv && . .venv/bin/activate && pip install -e ".[dev,dbt]"
 
 lint:               ## ruff + sqlfluff + terraform fmt
 	ruff check . && ruff format --check .
@@ -61,5 +67,14 @@ run:                ## ingestion + dbt pour un mois (MONTH=2026-10)
 backfill:           ## rejouer une période : make backfill FROM=2020-01 TO=2026-10
 	bash scripts/backfill.sh $(FROM) $(TO)
 
-dbt-build:
-	cd dbt && dbt build --target $(ENV)
+dbt-deps:           ## étape 5 : paquets dbt (dbt_utils, version figée)
+	$(DBT) deps
+
+dbt-build:          ## seeds, modèles et tests (ENV=dev par défaut)
+	$(DBT) build --target $(ENV)
+
+dbt-freshness:      ## fraîcheur des sources bronze
+	$(DBT) source freshness --target $(ENV)
+
+dbt-docs:           ## documentation et lineage, servis sur http://localhost:8081
+	$(DBT) docs generate --target $(ENV) && $(DBT) docs serve --port 8081

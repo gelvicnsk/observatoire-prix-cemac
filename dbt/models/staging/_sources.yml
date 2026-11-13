@@ -1,6 +1,42 @@
 version: 2
-# Tables du dataset bronze, avec règles de fraîcheur. Complété à l'étape 5.
+
 sources:
   - name: bronze
+    description: >
+      Tables externes posées par le job d'ingestion sur les Parquet du bucket raw (partitions Hive).
+      Chaque fichier est un historique complet, adressé par son empreinte (ADR-005).
     schema: bronze
-    tables: []
+    # Fraîcheur = date de la dernière nouvelle version reçue. Les sources publient une fois par mois
+    # au plus ; au-delà de 45 jours sans nouveauté, on prévient ; au-delà de 90, on bloque.
+    config:
+      loaded_at_field: ingested_at
+      freshness:
+        warn_after: {count: 45, period: day}
+        error_after: {count: 90, period: day}
+    tables:
+      - name: wfp_prices
+        description: Prix au détail et de gros par marché, produit et mois (PAM, HDX). Un fichier par pays et par version.
+        columns:
+          - name: country
+            description: Partition Hive (code ISO3).
+          - name: source_sha256
+            data_tests: [not_null]
+      - name: rainfall_adm2
+        description: Pluie CHIRPS par district et par décade (PAM, HDX). Un fichier par pays et par version.
+      - name: world_bank_indicators
+        description: Inflation et population par pays et par année (Banque mondiale).
+        config:
+          freshness:
+            warn_after: {count: 400, period: day}
+            error_after: {count: 800, period: day}
+      - name: fx_eur_usd
+        description: Taux EUR/USD moyens mensuels (BCE).
+
+  - name: meta
+    description: Journal technique écrit par le job d'ingestion.
+    schema: meta
+    tables:
+      - name: processed_files
+        description: Une ligne par fichier écrit (empreinte, chemin, nombre de lignes).
+      - name: load_log
+        description: Une ligne par fichier traité (success, skipped, failed).

@@ -1,0 +1,15 @@
+version: 2
+
+seeds:
+  - name: country
+    description: Les 6 pays de la CEMAC et la profondeur des prix du PAM constatée à l'inventaire (étape 1).
+    config:
+      column_types:
+        iso3: string
+        name_fr: string
+        currency: string
+        has_market_prices: boolean
+        market_prices_until: string
+    columns:
+      - name: iso3
+        data_tests: [unique, not_null]
