@@ -31,3 +31,6 @@ data/
 # Variables Terraform locales (identifiant de facturation)
 *.tfvars
 !*.tfvars.example
+# Les environnements ne contiennent aucun secret : versionnés pour la CI
+!infra/envs/*/terraform.tfvars
+tfplan

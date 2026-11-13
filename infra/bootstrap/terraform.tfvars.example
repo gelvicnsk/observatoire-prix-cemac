@@ -1,0 +1,6 @@
+# Copier en terraform.tfvars (non versionné).
+# Le compte de facturation se passe par variable d'environnement : TF_VAR_billing_account
+dev_project_id    = "obs-cemac-dev-11259"
+prod_project_id   = "obs-cemac-prod-11259"
+region            = "europe-west1"
+github_repository = "gelvicnsk/observatoire-prix-cemac"

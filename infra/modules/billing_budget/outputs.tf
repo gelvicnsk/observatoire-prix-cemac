@@ -1,1 +1,3 @@
-# Sorties du module : Budget mensuel et alertes à 50, 90 et 100 %
+output "budget_name" {
+  value = google_billing_budget.monthly.name
+}

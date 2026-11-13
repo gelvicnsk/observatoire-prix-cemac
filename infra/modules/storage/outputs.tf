@@ -1,1 +1,3 @@
-# Sorties du module : Bucket raw (Parquet) et règles de cycle de vie
+output "raw_bucket" {
+  value = google_storage_bucket.raw.name
+}

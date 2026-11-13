@@ -12,7 +12,19 @@ variable "bq_location" {
   default = "EU"
 }
 
-variable "monthly_budget_eur" {
+variable "billing_account" {
+  type        = string
+  description = "Fourni par TF_VAR_billing_account (jamais versionné)"
+  sensitive   = true
+}
+
+variable "budget_amount" {
   type    = number
-  default = 10
+  default = 5
+}
+
+variable "budget_currency" {
+  type        = string
+  description = "Devise du compte de facturation (TF_VAR_budget_currency)"
+  default     = "EUR"
 }

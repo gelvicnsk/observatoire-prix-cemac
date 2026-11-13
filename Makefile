@@ -4,7 +4,7 @@ export PATH := $(CURDIR)/.venv/bin:$(PATH)
 ENV ?= dev
 MONTH ?= $(shell date -d "last month" +%Y-%m)
 
-.PHONY: help install lint test profile tf-bootstrap tf-plan tf-apply run backfill dbt-build
+.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy run backfill dbt-build
 
 help:
 	@grep -E '^[a-z-]+:' Makefile | cut -d: -f1
@@ -23,14 +23,31 @@ test:               ## tests unitaires
 profile:            ## étape 1 : fiche de profondeur par pays
 	python scripts/profile_sources.py
 
-tf-bootstrap:       ## étape 2 : une seule fois, en local
-	terraform -chdir=infra/bootstrap init && terraform -chdir=infra/bootstrap apply
+tf-bootstrap:       ## étape 2 : une seule fois, en local (TF_VAR_billing_account requis)
+	terraform -chdir=infra/bootstrap init
+	terraform -chdir=infra/bootstrap apply
 
-tf-plan:
-	terraform -chdir=infra/envs/$(ENV) init && terraform -chdir=infra/envs/$(ENV) plan
+tf-fmt:             ## formate tous les fichiers Terraform
+	terraform -chdir=infra fmt -recursive
 
-tf-apply:
-	terraform -chdir=infra/envs/$(ENV) apply
+tf-validate:        ## vérifie la syntaxe de chaque environnement (sans accès au backend)
+	for d in bootstrap envs/dev envs/prod; do \
+	  terraform -chdir=infra/$$d init -backend=false -input=false >/dev/null && \
+	  terraform -chdir=infra/$$d validate || exit 1; \
+	done
+
+tf-init:
+	terraform -chdir=infra/envs/$(ENV) init -backend-config=backend.hcl -input=false
+
+tf-plan: tf-init    ## make tf-plan ENV=dev
+	terraform -chdir=infra/envs/$(ENV) plan -out=tfplan
+
+tf-apply:           ## applique le plan produit par tf-plan
+	terraform -chdir=infra/envs/$(ENV) apply tfplan
+
+tf-destroy:         ## dev uniquement : vérifie que tout se recrée depuis zéro
+	@test "$(ENV)" = "dev" || (echo "destroy autorisé en dev uniquement" && exit 1)
+	terraform -chdir=infra/envs/dev destroy
 
 run:                ## ingestion + dbt pour un mois (MONTH=2026-10)
 	bash scripts/run_local.sh $(MONTH)
