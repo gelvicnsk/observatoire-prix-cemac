@@ -3,8 +3,8 @@
 Pipeline batch mensuel sur Google Cloud qui rassemble les prix alimentaires publics des 6 pays de la CEMAC,
 les normalise et signale les hausses anormales par marché et par produit.
 
-> Projet personnel. Données publiques réelles (Programme alimentaire mondial via HDX, Banque mondiale,
-> Open-Meteo). Aucune donnée n'est modifiée à la main : chaque règle de normalisation est versionnée.
+> Projet personnel. Données publiques réelles (Programme alimentaire mondial via HDX : prix et pluviométrie CHIRPS,
+> Banque mondiale, Banque centrale européenne). Aucune donnée n'est modifiée à la main : chaque règle de normalisation est versionnée.
 
 ---
 
@@ -52,7 +52,7 @@ qu'un prix dérape sur un marché.
 | 1. Inventaire des données | Client HDX, profilage des 6 pays, fiche `docs/data_profile.md` | Terminée |
 | 2. Socle Terraform | Projet GCP, buckets, datasets, comptes de service, budget, état distant | Terminée |
 | 3. CI de base | ruff, pytest, gitleaks, `terraform plan` en commentaire, Workload Identity Federation | En cours |
-| 4. Ingestion | Job Python : téléchargement, schéma explicite, Parquet, empreinte, journal | En cours (PAM, Banque mondiale, change ; pluie à venir) |
+| 4. Ingestion | Job Python : téléchargement, schéma explicite, Parquet, empreinte, journal | En cours (prix, pluie CHIRPS, Banque mondiale, change) |
 | 5. dbt silver et gold | Tables de correspondance, staging, faits, dimensions, tests | À faire |
 | 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | À faire |
 | 7. Déploiement continu | Image, Artifact Registry, Cloud Run Jobs, Scheduler, dev puis prod | À faire |
@@ -75,6 +75,7 @@ Résultat de l'inventaire du 13 novembre 2026 (`make profile`). « Actif » = de
 
 - **Prix mensuels par marché** : 4 pays actifs, plus l'historique du Gabon.
 - **Indicateurs nationaux annuels** (inflation, population) : les 6 pays, y compris la Guinée équatoriale.
+- **Pluviométrie par district** (CHIRPS) : les 6 pays, depuis 1981. Les marchés sont rattachés à leur district à l'étape 5.
 
 **Monnaie.** Les 6 pays utilisent le franc CFA d'Afrique centrale (XAF), à parité fixe avec l'euro.
 Toutes les lignes du PAM sont en XAF. Les prix sont gardés en XAF et convertis en EUR et en USD pour comparer.
@@ -114,7 +115,7 @@ Toutes les lignes du PAM sont en XAF. Les prix sont gardés en XAF et convertis 
 |---|---|---|---|---|
 | PAM (WFP) sur HDX | Prix par marché, produit, unité, type de prix | Marché × produit × mois | Mensuelle | API CKAN de HDX, un CSV par pays |
 | Banque mondiale | Inflation, population | Pays × année | Annuelle | API Indicators |
-| Open-Meteo | Précipitations aux coordonnées de chaque marché | Marché × jour, agrégé au mois | Mensuelle | API historique |
+| Pluviométrie CHIRPS (PAM, HDX) | Pluie par décade, moyenne de long terme 1989-2018 et anomalies | District (admin2) × décade | Toutes les 2 semaines | API CKAN de HDX, un CSV par pays, depuis 1981 |
 | Taux de change | XAF fixe face à l'euro (655,957) ; EUR/USD moyenne mensuelle | Mois | Mensuelle | API de la Banque centrale européenne |
 
 **Règle d'ingestion.** Les sources publient un **historique complet** (le PAM republie tout l'historique d'un pays
@@ -141,10 +142,10 @@ gs://<bucket-raw>/wfp/country=COG/ingest_date=2026-11-13/<sha>.parquet         t
         ▼
  ┌──────────────────────┐    ┌───────────────────────────────┐
  │ Job d'ingestion      │───▶│ Cloud Storage  (raw, Parquet) │
- │ Cloud Run Job        │    │ source=wfp/country=COG/       │
- │ HDX, Open-Meteo,     │    │   month=2026-10/…parquet      │
- │ Banque mondiale, FX  │    └───────────────┬───────────────┘
- └──────────┬───────────┘                    │ chargement idempotent
+ │ Cloud Run Job        │    │ wfp/country=COG/              │
+ │ HDX (prix, pluie),   │    │   ingest_date=…/<sha>.parquet │
+ │ Banque mondiale, BCE │    └───────────────┬───────────────┘
+ └──────────┬───────────┘                    │ tables externes bronze
             │ meta : load_log, sha256        ▼
             │                ┌────────────────────────────────────────┐
             └───────────────▶│ BigQuery                               │
@@ -180,7 +181,7 @@ Cloud Scheduler et deux Cloud Run Jobs suffisent.
 
 | Dataset | Contenu | Construit par |
 |---|---|---|
-| `bronze` | Tables externes sur les Parquet de Cloud Storage (partitions Hive) : `wfp_prices`, `world_bank_indicators`, `fx_eur_usd` | Job d'ingestion |
+| `bronze` | Tables externes sur les Parquet de Cloud Storage (partitions Hive) : `wfp_prices`, `rainfall_adm2`, `world_bank_indicators`, `fx_eur_usd` | Job d'ingestion |
 | `silver` | Types, unités, noms et marchés normalisés, lignes hors périmètre retirées | dbt |
 | `gold` | Faits, dimensions et marts prêts à consommer | dbt |
 | `meta` | Journal de chargement, fichiers traités, lignes mises de côté, résultats de contrôle | Ingestion, dbt |
@@ -194,7 +195,7 @@ Cloud Scheduler et deux Cloud Run Jobs suffisent.
 | `dim_country` | un pays | Code ISO, statut des données (actif, historique, absent) |
 | `dim_month` | un mois | Année, trimestre |
 | `mart_price_alerts` | un marché, un produit, un mois en alerte | Variation sur 1 et 12 mois, z-score, niveau d'alerte |
-| `mart_rain_vs_price` | un marché, un mois | Pluie cumulée et écart à la normale, prix du panier |
+| `mart_rain_vs_price` | un marché, un mois | Pluie du district du marché, anomalie CHIRPS sur 1 et 3 mois, prix du panier |
 
 `fct_price_monthly` est partitionnée par mois et clusterisée par pays et produit ; les modèles volumineux
 sont incrémentaux (stratégie `merge` sur la clé de grain).
@@ -349,5 +350,6 @@ API, assistant en langage naturel, animaux sur pied.
   [HDX](https://data.humdata.org/dataset/wfp-food-prices-for-chad) — licence Creative Commons Attribution
   pour les organisations intergouvernementales (CC BY-IGO).
 - Indicateurs nationaux : Banque mondiale (API Indicators).
-- Pluviométrie : Open-Meteo (API historique).
+- Pluviométrie : CHIRPS v2 (Climate Hazards Center, UC Santa Barbara), agrégée par district par le PAM, sur HDX
+  — licence Creative Commons Attribution.
 - Code : licence à définir.
