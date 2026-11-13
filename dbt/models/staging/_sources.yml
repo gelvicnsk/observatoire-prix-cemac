@@ -1,0 +1,6 @@
+version: 2
+# Tables du dataset bronze, avec règles de fraîcheur. Complété à l'étape 5.
+sources:
+  - name: bronze
+    schema: bronze
+    tables: []

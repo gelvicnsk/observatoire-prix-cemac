@@ -1,0 +1,10 @@
+# CD sur main : terraform apply dev, image dans Artifact Registry, mise à jour des Cloud Run Jobs,
+# run de fumée en dev, puis prod après validation manuelle. Activé à l'étape 7.
+name: cd
+on:
+  workflow_dispatch:
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Déploiement continu : étape 7"

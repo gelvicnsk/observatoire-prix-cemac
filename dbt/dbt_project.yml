@@ -1,0 +1,26 @@
+name: observatoire_cemac
+version: "0.1.0"
+config-version: 2
+profile: observatoire_cemac
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+
+models:
+  observatoire_cemac:
+    staging:
+      +schema: silver
+      +materialized: view
+    intermediate:
+      +schema: silver
+      +materialized: table
+    marts:
+      +schema: gold
+      +materialized: table
+
+seeds:
+  observatoire_cemac:
+    +schema: silver

@@ -1,0 +1,29 @@
+# Secrets et environnements locaux
+.env
+*.json.key
+*credentials*.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+.terraform.lock.hcl.bak
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# Données locales
+data/
+*.parquet

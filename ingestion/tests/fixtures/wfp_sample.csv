@@ -1,0 +1,8 @@
+date,admin1,admin2,market,latitude,longitude,category,commodity,unit,priceflag,pricetype,currency,price,usdprice
+#date,#adm1+name,#adm2+name,#loc+market+name,#geo+lat,#geo+lon,#item+type,#item+name,#item+unit,#item+price+flag,#item+price+type,#currency+code,#value,#value+usd
+2025-01-15,Brazzaville,Brazzaville,Total,-4.27,15.28,cereals and tubers,Cassava (cossettes),KG,actual,Retail,XAF,600,0.95
+2025-02-15,Brazzaville,Brazzaville,Total,-4.27,15.28,cereals and tubers,Cassava (cossettes),KG,actual,Retail,XAF,650,1.03
+2025-03-15,Pointe-Noire,Pointe-Noire,Grand marché,,,cereals and tubers,Rice (imported),50 KG,aggregate,Wholesale,XAF,27500,43.6
+2025-03-15,Pointe-Noire,Pointe-Noire,Grand marché,,,oil and fats,Oil (palm),L,actual,Retail,XAF,abc,
+2025-04-15,Brazzaville,Brazzaville,Total,-4.27,15.28,cereals and tubers,Cassava (cossettes),KG,actual,Retail,XAF,0,0
+not-a-date,Brazzaville,Brazzaville,Total,-4.27,15.28,cereals and tubers,Cassava (cossettes),KG,actual,Retail,XAF,700,1.1

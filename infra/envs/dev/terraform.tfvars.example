@@ -1,0 +1,5 @@
+# Copier en terraform.tfvars (non versionné si sensible) et compléter.
+project_id         = ""
+region             = "europe-west1"
+bq_location        = "EU"
+monthly_budget_eur = 10

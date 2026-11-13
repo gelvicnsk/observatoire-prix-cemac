@@ -1,0 +1,16 @@
+# Rejouer une période (mois de début, mois de fin) sur un environnement. Activé à l'étape 7.
+name: backfill
+on:
+  workflow_dispatch:
+    inputs:
+      from_month:
+        description: "Premier mois (AAAA-MM)"
+        required: true
+      to_month:
+        description: "Dernier mois (AAAA-MM)"
+        required: true
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Backfill de ${{ inputs.from_month }} à ${{ inputs.to_month }} : étape 7"
