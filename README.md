@@ -51,7 +51,7 @@ qu'un prix dérape sur un marché.
 |---|---|---|
 | 1. Inventaire des données | Client HDX, profilage des 6 pays, fiche `docs/data_profile.md` | Terminée |
 | 2. Socle Terraform | Projet GCP, buckets, datasets, comptes de service, budget, état distant | Terminée |
-| 3. CI de base | ruff, pytest, `terraform plan` en commentaire, Workload Identity Federation | À faire |
+| 3. CI de base | ruff, pytest, gitleaks, `terraform plan` en commentaire, Workload Identity Federation | En cours |
 | 4. Ingestion | Job Python : téléchargement, schéma explicite, Parquet, empreinte, journal | À faire |
 | 5. dbt silver et gold | Tables de correspondance, staging, faits, dimensions, tests | À faire |
 | 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | À faire |
@@ -257,7 +257,8 @@ l'état est stocké dans un bucket dédié, un préfixe par environnement.
 
 ## 9. CI/CD et déploiement
 
-**Sur chaque pull request.**
+**Sur chaque pull request** (`.github/workflows/ci.yml`, en place depuis l'étape 3 ; dbt et l'image Docker
+s'ajouteront aux étapes 5 et 7).
 
 1. Lint : `ruff`, `sqlfluff`, `terraform fmt` et `terraform validate`.
 2. Tests `pytest` : client HDX, profilage, conversion d'unités, empreinte, règle d'alerte.
