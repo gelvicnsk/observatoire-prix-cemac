@@ -1,0 +1,89 @@
+version: 2
+
+# Premier passage : les contrôles dont on ne connaît pas encore le résultat sur les vraies données
+# sont en « warn » ; ils passeront en « error » une fois les données observées (étape 5C).
+
+models:
+  - name: stg_wfp__prices
+    description: Prix du PAM (dernière version par pays), renommés et typés.
+    columns:
+      - name: price_observation_id
+        description: Clé technique (pays, marché, produit, unité, type de prix, indicateur, date).
+        data_tests:
+          - not_null
+          - unique:
+              config: {severity: warn}
+      - name: price_date
+        data_tests: [not_null]
+      - name: country_iso3
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('country'), field: iso3}
+      - name: market_name
+        data_tests: [not_null]
+      - name: commodity_name
+        data_tests: [not_null]
+      - name: unit_raw
+        data_tests: [not_null]
+      - name: price_type
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['Retail', 'Wholesale']}
+              config: {severity: warn}
+      - name: currency_code
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['XAF']}
+              config: {severity: warn}
+      - name: price_local
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments: {expression: "> 0"}
+              config: {severity: warn}
+
+  - name: stg_chirps__rainfall_dekads
+    description: Pluie CHIRPS par unité administrative et par décade (dernière version par pays).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [country_iso3, pcode, dekad_start_date]}
+          config: {severity: warn}
+    columns:
+      - name: pcode
+        data_tests: [not_null]
+      - name: dekad_start_date
+        data_tests: [not_null]
+      - name: admin_level
+        data_tests:
+          - accepted_values:
+              arguments: {values: [1, 2], quote: false}
+              config: {severity: warn}
+      - name: rainfall_mm
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments: {expression: ">= 0"}
+              config: {severity: warn}
+
+  - name: stg_world_bank__indicators
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [country_iso3, indicator_id, year]}
+    columns:
+      - name: indicator_code
+        data_tests: [not_null]
+      - name: country_iso3
+        data_tests:
+          - relationships:
+              arguments: {to: ref('country'), field: iso3}
+
+  - name: stg_ecb__fx_monthly
+    columns:
+      - name: month
+        data_tests: [unique, not_null]
+      - name: usd_per_eur
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments: {expression: "between 0.5 and 2"}
+              config: {severity: warn}

@@ -9,8 +9,13 @@ macro-paths: ["macros"]
 test-paths: ["tests"]
 analysis-paths: ["analyses"]
 
+clean-targets: ["target", "dbt_packages"]
+
 models:
   observatoire_cemac:
+    +persist_docs:
+      relation: true
+      columns: true
     staging:
       +schema: silver
       +materialized: view
@@ -24,3 +29,7 @@ models:
 seeds:
   observatoire_cemac:
     +schema: silver
+
+data_tests:
+  observatoire_cemac:
+    +store_failures: false
