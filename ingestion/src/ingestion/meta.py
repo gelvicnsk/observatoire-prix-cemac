@@ -18,7 +18,7 @@ class ProcessedFile:
     sha256: str
     object_uri: str
     landing_uri: str
-    rows: int
+    row_count: int
     size_bytes: int
     ingested_at: str
     run_id: str
@@ -30,7 +30,7 @@ class LoadLogEntry:
     source: str
     partition_key: str
     status: str  # success | skipped | failed
-    rows: int
+    row_count: int
     message: str
     started_at: str
     finished_at: str
@@ -90,7 +90,7 @@ class BigQueryMeta:
             S("sha256", "STRING", "REQUIRED"),
             S("object_uri", "STRING", "REQUIRED"),
             S("landing_uri", "STRING", "REQUIRED"),
-            S("rows", "INT64", "REQUIRED"),
+            S("row_count", "INT64", "REQUIRED"),
             S("size_bytes", "INT64", "REQUIRED"),
             S("ingested_at", "TIMESTAMP", "REQUIRED"),
             S("run_id", "STRING", "REQUIRED"),
@@ -100,7 +100,7 @@ class BigQueryMeta:
             S("source", "STRING", "REQUIRED"),
             S("partition_key", "STRING", "REQUIRED"),
             S("status", "STRING", "REQUIRED"),
-            S("rows", "INT64", "REQUIRED"),
+            S("row_count", "INT64", "REQUIRED"),
             S("message", "STRING", "NULLABLE"),
             S("started_at", "TIMESTAMP", "REQUIRED"),
             S("finished_at", "TIMESTAMP", "REQUIRED"),
