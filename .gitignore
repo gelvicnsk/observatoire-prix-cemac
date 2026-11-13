@@ -27,3 +27,7 @@ dbt/logs/
 # Données locales
 data/
 *.parquet
+
+# Variables Terraform locales (identifiant de facturation)
+*.tfvars
+!*.tfvars.example
