@@ -4,7 +4,7 @@ export PATH := $(CURDIR)/.venv/bin:$(PATH)
 ENV ?= dev
 MONTH ?= $(shell date -d "last month" +%Y-%m)
 
-.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy run backfill dbt-build
+.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run backfill dbt-build
 
 help:
 	@grep -E '^[a-z-]+:' Makefile | cut -d: -f1
@@ -48,6 +48,12 @@ tf-apply:           ## applique le plan produit par tf-plan
 tf-destroy:         ## dev uniquement : vérifie que tout se recrée depuis zéro
 	@test "$(ENV)" = "dev" || (echo "destroy autorisé en dev uniquement" && exit 1)
 	terraform -chdir=infra/envs/dev destroy
+
+ingest-local:       ## étape 4 : ingestion en local (data/lake), sans accès GCP
+	python -m ingestion.main --target local
+
+ingest:             ## étape 4 : ingestion vers le bucket raw, meta et les tables externes bronze
+	python -m ingestion.main --target gcp
 
 run:                ## ingestion + dbt pour un mois (MONTH=2026-10)
 	bash scripts/run_local.sh $(MONTH)

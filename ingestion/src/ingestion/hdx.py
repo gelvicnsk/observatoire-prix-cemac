@@ -118,6 +118,13 @@ class HdxClient:
             )
         return None
 
+    def fetch_bytes(self, url: str) -> bytes:
+        """Contenu complet d'une ressource (quelques Mo au plus), avec les mêmes tentatives que l'API."""
+        response = self._get(url)
+        if response.status_code == 404:
+            raise RuntimeError(f"Ressource introuvable : {url}")
+        return response.content
+
     def download(self, url: str, destination: Path) -> Download:
         """Télécharge vers un fichier temporaire, puis le renomme : jamais de fichier à moitié écrit."""
         destination.parent.mkdir(parents=True, exist_ok=True)
