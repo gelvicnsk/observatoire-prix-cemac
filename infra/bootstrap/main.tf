@@ -37,6 +37,8 @@ locals {
   plan_roles = [
     "roles/viewer",
     "roles/iam.securityReviewer",
+    # Les appels portent l'en-tête du projet de quota (user_project_override) : il faut le droit de l'utiliser
+    "roles/serviceusage.serviceUsageConsumer",
   ]
 
   # Rôles du compte tf-apply : créer et modifier l'infrastructure décrite dans infra/
