@@ -50,7 +50,7 @@ qu'un prix dérape sur un marché.
 | Étape | Contenu | Statut |
 |---|---|---|
 | 1. Inventaire des données | Client HDX, profilage des 6 pays, fiche `docs/data_profile.md` | Terminée |
-| 2. Socle Terraform | Projet GCP, buckets, datasets, comptes de service, budget, état distant | En cours |
+| 2. Socle Terraform | Projet GCP, buckets, datasets, comptes de service, budget, état distant | Terminée |
 | 3. CI de base | ruff, pytest, `terraform plan` en commentaire, Workload Identity Federation | À faire |
 | 4. Ingestion | Job Python : téléchargement, schéma explicite, Parquet, empreinte, journal | À faire |
 | 5. dbt silver et gold | Tables de correspondance, staging, faits, dimensions, tests | À faire |
