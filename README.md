@@ -1,7 +1,5 @@
 # Observatoire des prix alimentaires CEMAC
 
-[![CI](https://github.com/gelvicnsk/observatoire-prix-cemac/actions/workflows/ci.yml/badge.svg)](https://github.com/gelvicnsk/observatoire-prix-cemac/actions/workflows/ci.yml)
-
 Pipeline batch mensuel sur Google Cloud qui rassemble les prix alimentaires publics des 6 pays de la CEMAC,
 les normalise et signale les hausses anormales par marché et par produit.
 
@@ -53,8 +51,8 @@ qu'un prix dérape sur un marché.
 |---|---|---|
 | 1. Inventaire des données | Client HDX, profilage des 6 pays, fiche `docs/data_profile.md` | Terminée |
 | 2. Socle Terraform | Projet GCP, buckets, datasets, comptes de service, budget, état distant | Terminée |
-| 3. CI de base | ruff, pytest, gitleaks, `terraform plan` en commentaire, Workload Identity Federation | Terminée |
-| 4. Ingestion | Job Python : téléchargement, schéma explicite, Parquet, empreinte, journal | À faire |
+| 3. CI de base | ruff, pytest, gitleaks, `terraform plan` en commentaire, Workload Identity Federation | En cours |
+| 4. Ingestion | Job Python : téléchargement, schéma explicite, Parquet, empreinte, journal | En cours (PAM, Banque mondiale, change ; pluie à venir) |
 | 5. dbt silver et gold | Tables de correspondance, staging, faits, dimensions, tests | À faire |
 | 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | À faire |
 | 7. Déploiement continu | Image, Artifact Registry, Cloud Run Jobs, Scheduler, dev puis prod | À faire |
@@ -116,13 +114,22 @@ Toutes les lignes du PAM sont en XAF. Les prix sont gardés en XAF et convertis 
 |---|---|---|---|---|
 | PAM (WFP) sur HDX | Prix par marché, produit, unité, type de prix | Marché × produit × mois | Mensuelle | API CKAN de HDX, un CSV par pays |
 | Banque mondiale | Inflation, population | Pays × année | Annuelle | API Indicators |
-| FAOSTAT (à vérifier à l'étape 4) | Indice des prix alimentaires à la consommation | Pays × mois | Mensuelle | Téléchargement direct sur FAOSTAT |
 | Open-Meteo | Précipitations aux coordonnées de chaque marché | Marché × jour, agrégé au mois | Mensuelle | API historique |
-| Taux de change | XAF fixe face à l'euro ; EUR/USD mensuel | Mois | Mensuelle | Table de référence + série publique |
+| Taux de change | XAF fixe face à l'euro (655,957) ; EUR/USD moyenne mensuelle | Mois | Mensuelle | API de la Banque centrale européenne |
 
-**Règle d'ingestion.** Chaque fichier téléchargé est conservé tel quel, horodaté, avec son empreinte sha256 :
-un fichier déjà vu n'est pas rechargé, et un fichier modifié par l'éditeur est détecté.
-Tout est lu en texte, puis converti explicitement : aucun type n'est deviné.
+**Règle d'ingestion.** Les sources publient un **historique complet** (le PAM republie tout l'historique d'un pays
+à chaque mise à jour) : chaque run télécharge ce fichier, calcule son empreinte sha256 et ne l'écrit que s'il a changé.
+
+```
+gs://<bucket-raw>/_landing/wfp/country=COG/ingest_date=2026-11-13/<sha>.csv    original, tel quel
+gs://<bucket-raw>/wfp/country=COG/ingest_date=2026-11-13/<sha>.parquet         typé, lu par bronze
+```
+
+- Le chemin dépend de l'empreinte : réécrire un fichier produit le même objet (idempotent).
+- `meta.processed_files` mémorise les empreintes ; `meta.load_log` trace chaque fichier (succès, ignoré, échec).
+- Tout est lu en texte puis converti explicitement ; une colonne absente ou une valeur illisible arrête
+  le chargement de ce fichier au lieu de charger faux. Les montants sont en décimal, jamais en flottant.
+- Les versions successives restent disponibles : silver retient la dernière par pays (`ingested_at`).
 
 ## 5. Architecture
 
@@ -173,7 +180,7 @@ Cloud Scheduler et deux Cloud Run Jobs suffisent.
 
 | Dataset | Contenu | Construit par |
 |---|---|---|
-| `bronze` | Tables sur les Parquet bruts de Cloud Storage, une par source | Job d'ingestion |
+| `bronze` | Tables externes sur les Parquet de Cloud Storage (partitions Hive) : `wfp_prices`, `world_bank_indicators`, `fx_eur_usd` | Job d'ingestion |
 | `silver` | Types, unités, noms et marchés normalisés, lignes hors périmètre retirées | dbt |
 | `gold` | Faits, dimensions et marts prêts à consommer | dbt |
 | `meta` | Journal de chargement, fichiers traités, lignes mises de côté, résultats de contrôle | Ingestion, dbt |
@@ -291,6 +298,8 @@ cp .env.example .env
 make install      # environnement Python local
 make test         # tests unitaires
 make profile      # étape 1 : inventaire des 6 pays sur HDX → docs/data_profile.md
+make ingest-local # étape 4 : ingestion dans data/lake, sans accès GCP
+make ingest       # étape 4 : ingestion vers le bucket raw, meta et bronze (projet dev, identifiants gcloud)
 ```
 
 Sorties de l'inventaire : `docs/data_profile.md` (versionné), `data/profile/units.csv`,

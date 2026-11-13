@@ -1,0 +1,8 @@
+[
+  {"page": 1, "pages": 1, "per_page": 1000, "total": 3},
+  [
+    {"indicator": {"id": "FP.CPI.TOTL.ZG", "value": "Inflation, consumer prices (annual %)"}, "country": {"id": "CG", "value": "Congo, Rep."}, "countryiso3code": "COG", "date": "2024", "value": 3.1, "unit": "", "obs_status": "", "decimal": 1},
+    {"indicator": {"id": "FP.CPI.TOTL.ZG", "value": "Inflation, consumer prices (annual %)"}, "country": {"id": "CG", "value": "Congo, Rep."}, "countryiso3code": "COG", "date": "2025", "value": null, "unit": "", "obs_status": "", "decimal": 1},
+    {"indicator": {"id": "FP.CPI.TOTL.ZG", "value": "Inflation, consumer prices (annual %)"}, "country": {"id": "GQ", "value": "Equatorial Guinea"}, "countryiso3code": "GNQ", "date": "2024", "value": 3.4, "unit": "", "obs_status": "", "decimal": 1}
+  ]
+]

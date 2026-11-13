@@ -6,6 +6,7 @@ aucun type n'est deviné par pandas, et chaque valeur non convertible est compt�
 
 from __future__ import annotations
 
+import io
 from dataclasses import asdict, dataclass, field
 from datetime import date
 from pathlib import Path
@@ -17,9 +18,10 @@ from ingestion.config import WFP_OPTIONAL_COLUMNS, WFP_REQUIRED_COLUMNS
 ACTIVE_MAX_MONTHS = 6  # au-delà, la série est considérée comme historique
 
 
-def read_csv_as_text(path: Path) -> pd.DataFrame:
-    """Lit un CSV HDX en texte et retire la ligne de balises HXL (#date, #adm1+name…) si elle existe."""
-    frame = pd.read_csv(path, dtype=str, keep_default_na=False, encoding="utf-8-sig")
+def read_csv_as_text(source: Path | bytes) -> pd.DataFrame:
+    """Lit un CSV HDX (chemin ou contenu) en texte et retire la ligne de balises HXL (#date, #adm1+name…)."""
+    handle = io.BytesIO(source) if isinstance(source, bytes | bytearray) else source
+    frame = pd.read_csv(handle, dtype=str, keep_default_na=False, encoding="utf-8-sig")
     frame.columns = [str(column).strip().lower() for column in frame.columns]
     if len(frame) and frame.iloc[0].astype(str).str.startswith("#").all():
         frame = frame.iloc[1:].reset_index(drop=True)
