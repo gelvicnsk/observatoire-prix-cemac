@@ -1,5 +1,7 @@
 # Observatoire des prix alimentaires CEMAC
 
+[![CI](https://github.com/gelvicnsk/observatoire-prix-cemac/actions/workflows/ci.yml/badge.svg)](https://github.com/gelvicnsk/observatoire-prix-cemac/actions/workflows/ci.yml)
+
 Pipeline batch mensuel sur Google Cloud qui rassemble les prix alimentaires publics des 6 pays de la CEMAC,
 les normalise et signale les hausses anormales par marché et par produit.
 
@@ -51,7 +53,7 @@ qu'un prix dérape sur un marché.
 |---|---|---|
 | 1. Inventaire des données | Client HDX, profilage des 6 pays, fiche `docs/data_profile.md` | Terminée |
 | 2. Socle Terraform | Projet GCP, buckets, datasets, comptes de service, budget, état distant | Terminée |
-| 3. CI de base | ruff, pytest, gitleaks, `terraform plan` en commentaire, Workload Identity Federation | En cours |
+| 3. CI de base | ruff, pytest, gitleaks, `terraform plan` en commentaire, Workload Identity Federation | Terminée |
 | 4. Ingestion | Job Python : téléchargement, schéma explicite, Parquet, empreinte, journal | À faire |
 | 5. dbt silver et gold | Tables de correspondance, staging, faits, dimensions, tests | À faire |
 | 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | À faire |
