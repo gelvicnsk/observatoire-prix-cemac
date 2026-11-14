@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: mart_rain_vs_price
+    description: >
+      Un marché, un mois : indice de prix au détail (médiane des séries, 100 = moyenne des 24 mois précédents),
+      nombre d'alertes, et pluie du district en % de la normale sur 1 et 3 mois.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [market_key, month]}
+    columns:
+      - name: market_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_market'), field: market_key}
+      - name: price_index_median
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments: {expression: "> 0"}
+      - name: rainfall_pct_of_normal
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments: {expression: ">= 0"}
+
+  - name: mart_price_dashboard
+    description: Prix mensuels avec noms, position du marché et indicateurs d'évolution, pour Looker Studio.
+    columns:
+      - name: price_monthly_id
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments: {to: ref('fct_price_monthly'), field: price_monthly_id}
