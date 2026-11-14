@@ -28,3 +28,36 @@ models:
         data_tests:
           - dbt_utils.expression_is_true:
               arguments: {expression: ">= 0"}
+
+  - name: int_chirps__rainfall_monthly
+    description: Pluie mensuelle par code administratif, cumul sur 3 mois et % de la normale (ADR-007).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [country_iso3, pcode, rainfall_month]}
+    columns:
+      - name: n_dekads
+        data_tests:
+          - accepted_values:
+              arguments: {values: [1, 2, 3], quote: false}
+
+  - name: int_wfp__prices_normalized
+    description: >
+      Prix du PAM rapprochés des référentiels et ramenés au kg ou au litre. exclusion_reason dit pourquoi une
+      ligne ne va pas dans les faits (null = retenue). is_suspect : hors d'un facteur 10 de la médiane.
+    columns:
+      - name: price_observation_id
+        data_tests: [unique, not_null]
+      - name: exclusion_reason
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['marche_exclu', 'produit_hors_panier', 'unite_exclue', 'unite_sans_poids', 'prevision',
+                         'sans_correspondance']
+          # une ligne sans correspondance veut dire qu'un référentiel est à compléter (make seeds-reference)
+          - dbt_utils.expression_is_true:
+              arguments: {expression: "!= 'sans_correspondance'"}
+              config: {severity: warn}
+      - name: price_xaf_per_unit
+        data_tests:
+          - not_null:
+              config: {where: "exclusion_reason is null"}
