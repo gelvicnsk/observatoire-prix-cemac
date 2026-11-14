@@ -1,66 +1,66 @@
 commodity_raw,wfp_category,name_fr,group_fr,include_in_index,status
 Bananas,vegetables and fruits,Banane,Fruits et légumes,true,auto
-"Beans (green, fresh)",vegetables and fruits,"Haricots (green, frais)",Fruits et légumes,true,a_verifier
-Beans (niebe),pulses and nuts,Haricots (niebe),Légumineuses et oléagineux,true,a_verifier
-"Beans (niebe, red)",pulses and nuts,"Haricots (niebe, rouge)",Légumineuses et oléagineux,true,a_verifier
+"Beans (green, fresh)",vegetables and fruits,Haricots verts (frais),Fruits et légumes,true,relu
+Beans (niebe),pulses and nuts,Niébé,Légumineuses et oléagineux,true,relu
+"Beans (niebe, red)",pulses and nuts,Niébé (rouge),Légumineuses et oléagineux,true,relu
 Beans (red),pulses and nuts,Haricots (rouge),Légumineuses et oléagineux,true,auto
 Beans (white),pulses and nuts,Haricots (blanc),Légumineuses et oléagineux,true,auto
 Bread,cereals and tubers,Pain,Céréales et tubercules,true,auto
 Cassava,cereals and tubers,Manioc,Céréales et tubercules,true,auto
-Cassava (cossette),cereals and tubers,Manioc (cossette),Céréales et tubercules,true,a_verifier
+Cassava (cossette),cereals and tubers,Manioc (cossettes),Céréales et tubercules,true,relu
 Cassava (fresh),cereals and tubers,Manioc (frais),Céréales et tubercules,true,auto
 Cassava flour,cereals and tubers,Farine de manioc,Céréales et tubercules,true,auto
-Cassava meal (foufou),cereals and tubers,Cassava meal (foufou),Céréales et tubercules,true,a_verifier
-Cassava meal (gari),cereals and tubers,Cassava meal (gari),Céréales et tubercules,true,a_verifier
+Cassava meal (foufou),cereals and tubers,Farine de manioc (foufou),Céréales et tubercules,true,relu
+Cassava meal (gari),cereals and tubers,Gari,Céréales et tubercules,true,relu
 Charcoal,non-food,Charbon de bois,Non alimentaire,false,auto
-Chicken,"meat, fish and eggs",Chicken,"Viande, poisson et œufs",true,a_verifier
-Cocoyam (macabo),cereals and tubers,Macabo (macabo),Céréales et tubercules,true,a_verifier
+Chicken,"meat, fish and eggs",Poulet,"Viande, poisson et œufs",true,relu
+Cocoyam (macabo),cereals and tubers,Macabo,Céréales et tubercules,true,relu
 Cowpeas (Red),pulses and nuts,Niébé (rouge),Légumineuses et oléagineux,true,auto
 Dates,vegetables and fruits,Dattes,Fruits et légumes,true,auto
 Eggs,"meat, fish and eggs",Œufs,"Viande, poisson et œufs",true,auto
-Exchange rate,non-food,Exchange rate,Non alimentaire,false,a_verifier
+Exchange rate,non-food,Taux de change,Non alimentaire,false,relu
 Fish,"meat, fish and eggs",Poisson,"Viande, poisson et œufs",true,auto
-Fish (catfish),"meat, fish and eggs",Poisson (catfish),"Viande, poisson et œufs",true,a_verifier
+Fish (catfish),"meat, fish and eggs",Poisson-chat (silure),"Viande, poisson et œufs",true,relu
 Fish (dry),"meat, fish and eggs",Poisson (sec),"Viande, poisson et œufs",true,auto
 Fish (fresh),"meat, fish and eggs",Poisson (frais),"Viande, poisson et œufs",true,auto
 Fish (frozen),"meat, fish and eggs",Poisson (congelé),"Viande, poisson et œufs",true,auto
-"Fish (mackerel, fresh)","meat, fish and eggs","Poisson (mackerel, frais)","Viande, poisson et œufs",true,a_verifier
-Fish (salted),"meat, fish and eggs",Poisson (salted),"Viande, poisson et œufs",true,a_verifier
-"Fish (sardine, canned)","meat, fish and eggs","Poisson (sardine, canned)","Viande, poisson et œufs",true,a_verifier
+"Fish (mackerel, fresh)","meat, fish and eggs",Maquereau (frais),"Viande, poisson et œufs",true,relu
+Fish (salted),"meat, fish and eggs",Poisson (salé),"Viande, poisson et œufs",true,relu
+"Fish (sardine, canned)","meat, fish and eggs",Sardines (en conserve),"Viande, poisson et œufs",true,relu
 Fish (smoked),"meat, fish and eggs",Poisson (fumé),"Viande, poisson et œufs",true,auto
-"Fish (tilapia, salted, dried)","meat, fish and eggs","Poisson (tilapia, salted, séché)","Viande, poisson et œufs",true,a_verifier
-Fuel (gas),non-food,Carburant (gas),Non alimentaire,false,a_verifier
+"Fish (tilapia, salted, dried)","meat, fish and eggs","Tilapia (salé, séché)","Viande, poisson et œufs",true,relu
+Fuel (gas),non-food,Carburant (gaz),Non alimentaire,false,a_verifier
 Fuel (petrol-gasoline),non-food,Carburant (essence),Non alimentaire,false,auto
 Garlic,vegetables and fruits,Ail,Fruits et légumes,true,auto
 Groundnuts,pulses and nuts,Arachide,Légumineuses et oléagineux,true,auto
-Groundnuts (paste),oil and fats,Arachide (paste),Huiles et graisses,true,a_verifier
+Groundnuts (paste),oil and fats,Pâte d'arachide,Huiles et graisses,true,relu
 Groundnuts (shelled),pulses and nuts,Arachide (décortiquée),Légumineuses et oléagineux,true,auto
 Groundnuts (unshelled),pulses and nuts,Arachide (en coque),Légumineuses et oléagineux,true,auto
-Laundry detergent,non-food,Laundry detergent,Non alimentaire,false,a_verifier
-Laundry soap,non-food,Laundry soap,Non alimentaire,false,a_verifier
-Leafy vegetables,vegetables and fruits,Leafy vegetables,Fruits et légumes,true,a_verifier
+Laundry detergent,non-food,Lessive,Non alimentaire,false,relu
+Laundry soap,non-food,Savon de lessive,Non alimentaire,false,relu
+Leafy vegetables,vegetables and fruits,Légumes-feuilles,Fruits et légumes,true,relu
 Livestock (cattle),"meat, fish and eggs",Bétail (bovin),"Viande, poisson et œufs",true,auto
-"Livestock (goat, medium-sized castrated male)","meat, fish and eggs","Bétail (chèvre, medium-sized castrated male)","Viande, poisson et œufs",true,a_verifier
-"Livestock (sheep, medium-sized castrated male)","meat, fish and eggs","Bétail (mouton, medium-sized castrated male)","Viande, poisson et œufs",true,a_verifier
+"Livestock (goat, medium-sized castrated male)","meat, fish and eggs","Chèvre sur pied (mâle castré, taille moyenne)","Viande, poisson et œufs",false,relu
+"Livestock (sheep, medium-sized castrated male)","meat, fish and eggs","Mouton sur pied (mâle castré, taille moyenne)","Viande, poisson et œufs",false,relu
 Maize,cereals and tubers,Maïs,Céréales et tubercules,true,auto
 Maize (white),cereals and tubers,Maïs (blanc),Céréales et tubercules,true,auto
 Maize (yellow),cereals and tubers,Maïs (jaune),Céréales et tubercules,true,auto
 Maize flour,cereals and tubers,Farine de maïs,Céréales et tubercules,true,auto
 Mangoes,vegetables and fruits,Mangues,Fruits et légumes,true,auto
-"Meat (antelope, smoked)","meat, fish and eggs","Viande (antelope, fumé)","Viande, poisson et œufs",true,a_verifier
+"Meat (antelope, smoked)","meat, fish and eggs",Viande d'antilope (fumée),"Viande, poisson et œufs",true,relu
 Meat (beef),"meat, fish and eggs",Viande (bœuf),"Viande, poisson et œufs",true,auto
 Meat (chicken),"meat, fish and eggs",Viande (poulet),"Viande, poisson et œufs",true,auto
 "Meat (chicken, frozen)","meat, fish and eggs","Viande (poulet, congelé)","Viande, poisson et œufs",true,auto
-"Meat (gazelle, smoked)","meat, fish and eggs","Viande (gazelle, fumé)","Viande, poisson et œufs",true,a_verifier
-"Milk (cow, pasteurized)",milk and dairy,"Lait (cow, pasteurized)",Lait et produits laitiers,true,a_verifier
+"Meat (gazelle, smoked)","meat, fish and eggs",Viande de gazelle (fumée),"Viande, poisson et œufs",true,relu
+"Milk (cow, pasteurized)",milk and dairy,Lait de vache (pasteurisé),Lait et produits laitiers,true,relu
 Milk (powder),milk and dairy,Lait (en poudre),Lait et produits laitiers,true,auto
 Millet,cereals and tubers,Mil,Céréales et tubercules,true,auto
-Oil (cotton),oil and fats,Huile (cotton),Huiles et graisses,true,a_verifier
+Oil (cotton),oil and fats,Huile de coton,Huiles et graisses,true,relu
 Oil (groundnut),oil and fats,Huile (arachide),Huiles et graisses,true,auto
 Oil (palm),oil and fats,Huile (palme),Huiles et graisses,true,auto
 "Oil (palm, refined)",oil and fats,"Huile (palme, raffiné)",Huiles et graisses,true,auto
 Oil (vegetable),oil and fats,Huile (végétale),Huiles et graisses,true,auto
-"Oil (vegetable, bulk)",oil and fats,"Huile (végétale, bulk)",Huiles et graisses,true,a_verifier
+"Oil (vegetable, bulk)",oil and fats,Huile végétale (vrac),Huiles et graisses,true,relu
 "Oil (vegetable, imported)",oil and fats,"Huile (végétale, importé)",Huiles et graisses,true,auto
 "Oil (vegetable, local)",oil and fats,"Huile (végétale, local)",Huiles et graisses,true,auto
 Okra (dry),vegetables and fruits,Gombo (sec),Fruits et légumes,true,auto
@@ -68,37 +68,37 @@ Okra (fresh),vegetables and fruits,Gombo (frais),Fruits et légumes,true,auto
 Onions,vegetables and fruits,Oignons,Fruits et légumes,true,auto
 Onions (red),vegetables and fruits,Oignons (rouge),Fruits et légumes,true,auto
 Pasta,cereals and tubers,Pâtes alimentaires,Céréales et tubercules,true,auto
-Pasta (spaghetti),cereals and tubers,Pâtes alimentaires (spaghetti),Céréales et tubercules,true,a_verifier
-Peanut,pulses and nuts,Peanut,Légumineuses et oléagineux,true,a_verifier
+Pasta (spaghetti),cereals and tubers,Spaghetti,Céréales et tubercules,true,relu
+Peanut,pulses and nuts,Arachide,Légumineuses et oléagineux,true,relu
 Peas (yellow),pulses and nuts,Pois (jaune),Légumineuses et oléagineux,true,auto
 Peppers (dried),vegetables and fruits,Poivrons (séché),Fruits et légumes,true,auto
 Plantains,vegetables and fruits,Banane plantain,Fruits et légumes,true,auto
 Potatoes,cereals and tubers,Pomme de terre,Céréales et tubercules,true,auto
-Potatoes (Irish),cereals and tubers,Pomme de terre (Irish),Céréales et tubercules,true,a_verifier
+Potatoes (Irish),cereals and tubers,Pomme de terre,Céréales et tubercules,true,relu
 Rice,cereals and tubers,Riz,Céréales et tubercules,true,auto
 "Rice (broken, imported)",cereals and tubers,"Riz (brisé, importé)",Céréales et tubercules,true,auto
 Rice (imported),cereals and tubers,Riz (importé),Céréales et tubercules,true,auto
 Rice (local),cereals and tubers,Riz (local),Céréales et tubercules,true,auto
 "Rice (long grain, imported)",cereals and tubers,"Riz (long, importé)",Céréales et tubercules,true,auto
-"Rice (mixed, low quality)",cereals and tubers,"Riz (mélangé, low quality)",Céréales et tubercules,true,a_verifier
+"Rice (mixed, low quality)",cereals and tubers,"Riz (mélangé, qualité inférieure)",Céréales et tubercules,true,relu
 Salt,miscellaneous food,Sel,Autres produits alimentaires,true,auto
 Sesame,pulses and nuts,Sésame,Légumineuses et oléagineux,true,auto
 Sorghum,cereals and tubers,Sorgho,Céréales et tubercules,true,auto
-Sorghum (berbere),cereals and tubers,Sorgho (berbere),Céréales et tubercules,true,a_verifier
+Sorghum (berbere),cereals and tubers,Sorgho berbéré,Céréales et tubercules,true,relu
 Sorghum (red),cereals and tubers,Sorgho (rouge),Céréales et tubercules,true,auto
 Sorghum (white),cereals and tubers,Sorgho (blanc),Céréales et tubercules,true,auto
 Soybeans,pulses and nuts,Soja,Légumineuses et oléagineux,true,auto
-Squashes,vegetables and fruits,Squashes,Fruits et légumes,true,a_verifier
+Squashes,vegetables and fruits,Courges,Fruits et légumes,true,relu
 Sugar,miscellaneous food,Sucre,Autres produits alimentaires,true,auto
 Sugar (white),miscellaneous food,Sucre (blanc),Autres produits alimentaires,true,auto
 Sweet potatoes,cereals and tubers,Patate douce,Céréales et tubercules,true,auto
 Taro,cereals and tubers,Taro,Céréales et tubercules,true,auto
 Tomatoes,vegetables and fruits,Tomates,Fruits et légumes,true,auto
 Tomatoes (dried),vegetables and fruits,Tomates (séché),Fruits et légumes,true,auto
-Wage (non-qualified labour),non-food,Salaire journalier (non-qualified labour),Non alimentaire,false,a_verifier
-Wage (qualified labour),non-food,Salaire journalier (qualified labour),Non alimentaire,false,a_verifier
-Water (drinking),non-food,Eau (drinking),Non alimentaire,false,a_verifier
-Watermelons,vegetables and fruits,Watermelons,Fruits et légumes,true,a_verifier
+Wage (non-qualified labour),non-food,Salaire journalier (main-d'œuvre non qualifiée),Non alimentaire,false,relu
+Wage (qualified labour),non-food,Salaire journalier (main-d'œuvre qualifiée),Non alimentaire,false,relu
+Water (drinking),non-food,Eau potable,Non alimentaire,false,relu
+Watermelons,vegetables and fruits,Pastèques,Fruits et légumes,true,relu
 Wheat,cereals and tubers,Blé,Céréales et tubercules,true,auto
 Wheat flour,cereals and tubers,Farine de blé,Céréales et tubercules,true,auto
 Yam,cereals and tubers,Igname,Céréales et tubercules,true,auto

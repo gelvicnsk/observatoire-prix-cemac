@@ -2,13 +2,13 @@ country_iso3,market_name,wfp_market_id,latitude,longitude,adm1_pcode,adm1_name,a
 CAF,Baboua,2069,5.8,14.83,CF22,Nana-Mambéré,CF223,Baboua,point_in_polygon,0.0,Baboua,true,false,CF223,2,auto
 CAF,Bambari,686,5.76,20.67,CF43,Ouaka,CF431,Bambari,point_in_polygon,0.0,Bambari,true,false,CF431,2,auto
 CAF,Bangassou,1856,4.73,22.82,CF62,Mbomou,CF621,Bangassou,point_in_polygon,0.0,Bangassou,true,false,CF621,2,auto
-CAF,Bangui,685,4.37,18.58,CF71,Bangui,CF714,Bangui-Rapides,point_in_polygon,0.0,Bangui,false,false,CF71,1,a_verifier
+CAF,Bangui,685,4.37,18.58,CF71,Bangui,CF714,Bangui-Rapides,point_in_polygon,0.0,Bangui,false,false,CF71,1,relu
 CAF,Baoro,2073,5.69,15.95,CF22,Nana-Mambéré,CF222,Baoro,point_in_polygon,0.0,Baoro,true,false,CF222,2,auto
-CAF,Batangafo,2203,7.3,18.28,CF33,Ouham-Fafa,CF331,Batangafo,point_in_polygon,0.0,Batangafo,true,false,,,a_verifier
+CAF,Batangafo,2203,7.3,18.28,CF33,Ouham-Fafa,CF331,Batangafo,point_in_polygon,0.0,Batangafo,true,false,,,relu
 CAF,Bayanga,2382,2.91,16.27,CF23,Sangha-Mbaéré,CF233,Bayanga,point_in_polygon,0.0,Bayanga,true,false,CF233,2,auto
 CAF,Berbérati,2066,4.26,15.79,CF21,Mambéré-Kadéï,CF211,Berbérati,point_in_polygon,0.0,Berbérati,true,false,CF211,2,auto
-CAF,Bimbo,2058,4.33,18.52,CF71,Bangui,CF713,Bangui-Fleuve,point_in_polygon,0.0,Bimbo,false,false,CF71,1,a_verifier
-CAF,Birao,2198,10.3,22.78,CF53,Vakaga,CF534,Am-Dafok,point_in_polygon,0.0,Birao,false,false,CF53,1,a_verifier
+CAF,Bimbo,2058,4.33,18.52,CF71,Bangui,CF713,Bangui-Fleuve,point_in_polygon,0.0,Bimbo,false,false,CF71,1,relu
+CAF,Birao,2198,10.3,22.78,CF53,Vakaga,CF534,Am-Dafok,point_in_polygon,0.0,Birao,false,false,CF53,1,relu
 CAF,Boali,2209,4.67,18.21,CF11,Ombella M'Poko,CF114,Boali,point_in_polygon,0.0,Boali,true,false,CF114,2,auto
 CAF,Bocaranga,2071,6.98,15.65,CF31,Ouham Pendé,CF312,Bocaranga,point_in_polygon,0.0,Bocaranga,true,false,CF312,2,auto
 CAF,Boda,2218,4.32,17.46,CF12,Lobaye,CF123,Boda,point_in_polygon,0.0,Boda,true,false,CF123,2,auto
@@ -17,16 +17,16 @@ CAF,Bossangoa,1792,6.5,17.45,CF32,Ouham,CF321,Bossangoa,point_in_polygon,0.0,Bos
 CAF,Bossembélé,2059,5.27,17.65,CF11,Ombella M'Poko,CF115,Bossembélé,point_in_polygon,0.0,Bossembélé,true,false,CF115,2,auto
 CAF,Bossemptélé,2070,5.67,16.65,CF11,Ombella M'Poko,CF116,Yaloké,point_in_polygon,0.0,Yaloké,true,false,CF116,2,auto
 CAF,Bouar,1791,5.95,15.6,CF22,Nana-Mambéré,CF221,Bouar,point_in_polygon,0.0,Bouar,true,false,CF221,2,auto
-CAF,Bouca,2062,6.5,18.28,CF33,Ouham-Fafa,CF333,Bouca,point_in_polygon,0.0,Bouca,true,false,,,a_verifier
+CAF,Bouca,2062,6.5,18.28,CF33,Ouham-Fafa,CF333,Bouca,point_in_polygon,0.0,Bouca,true,false,,,relu
 CAF,Bozoum,2061,6.32,16.37,CF31,Ouham Pendé,CF311,Bozoum,point_in_polygon,0.0,Bozoum,true,false,CF311,2,auto
 CAF,Bria,1857,6.53,21.98,CF52,Haute-Kotto,CF521,Bria,point_in_polygon,0.0,Bria,true,false,CF521,2,auto
-CAF,Bégoua,2080,4.45,18.54,CF71,Bangui,CF712,Bangui-Kagas,point_in_polygon,0.0,Bimbo,false,false,CF71,1,a_verifier
-CAF,Carnot,2078,4.94,15.87,CF24,Mambéré,CF241,Carnot,point_in_polygon,0.0,Carnot,true,false,,,a_verifier
-CAF,Combattant,2803,4.4,18.53,CF71,Bangui,CF711,Bangui-Centre,point_in_polygon,0.0,Bimbo,false,false,CF711,2,a_verifier
+CAF,Bégoua,2080,4.45,18.54,CF71,Bangui,CF712,Bangui-Kagas,point_in_polygon,0.0,Bimbo,false,false,CF71,1,relu
+CAF,Carnot,2078,4.94,15.87,CF24,Mambéré,CF241,Carnot,point_in_polygon,0.0,Carnot,true,false,,,relu
+CAF,Combattant,2803,4.4,18.53,CF71,Bangui,CF711,Bangui-Centre,point_in_polygon,0.0,Bimbo,false,false,CF711,2,relu
 CAF,Damara,2207,4.96,18.7,CF11,Ombella M'Poko,CF112,Damara,point_in_polygon,0.0,Damara,true,false,CF112,2,auto
 CAF,Dekoa,2219,6.32,19.08,CF41,Kémo,CF412,Dékoa,point_in_polygon,0.0,Dékoa,true,false,CF412,2,auto
 CAF,Gamboula,2064,4.12,15.14,CF21,Mambéré-Kadéï,CF212,Gamboula,point_in_polygon,0.0,Gamboula,true,false,CF212,2,auto
-CAF,Gobongo,2805,4.42,18.55,CF71,Bangui,CF712,Bangui-Kagas,point_in_polygon,0.0,Bangui,false,false,CF71,1,a_verifier
+CAF,Gobongo,2805,4.42,18.55,CF71,Bangui,CF712,Bangui-Kagas,point_in_polygon,0.0,Bangui,false,false,CF71,1,relu
 CAF,Ippy,2383,6.26,21.2,CF43,Ouaka,CF435,Ippy,point_in_polygon,0.0,Ippy,true,false,CF435,2,auto
 CAF,Kaga-Bandoro,1790,7.0,19.18,CF42,Nana-Gribizi,CF421,Kaga-Bandoro,point_in_polygon,0.0,Kaga-Bandoro,true,false,CF421,2,auto
 CAF,Mbaïki,2063,3.87,17.99,CF12,Lobaye,CF121,Mbaïki,point_in_polygon,0.0,Mbaïki,true,false,CF121,2,auto
@@ -34,9 +34,9 @@ CAF,Ndélé,2220,8.41,20.65,CF51,Bamingui-Bangoran,CF511,Ndélé,point_in_polygo
 CAF,Ngaoundaye,2200,6.99,15.62,CF31,Ouham Pendé,CF312,Bocaranga,point_in_polygon,0.0,Bocaranga,true,false,CF312,2,auto
 CAF,Nola,2060,3.52,16.04,CF23,Sangha-Mbaéré,CF231,Nola,point_in_polygon,0.0,Nola,true,false,CF231,2,auto
 CAF,Obo,2079,5.4,26.49,CF63,Haut-Mbomou,CF631,Obo,point_in_polygon,0.0,Obo,true,false,CF631,2,auto
-CAF,PK5,2806,4.36,18.59,CF71,Bangui,CF714,Bangui-Rapides,point_in_polygon,0.0,Bangui,false,false,CF71,1,a_verifier
-CAF,Paoua,1793,7.25,16.43,CF34,Lim-pendé,CF341,Paoua,point_in_polygon,0.0,Paoua,true,false,,,a_verifier
-CAF,Pétévo,2804,4.35,18.54,CF71,Bangui,CF713,Bangui-Fleuve,point_in_polygon,0.0,Bangui,false,false,CF71,1,a_verifier
+CAF,PK5,2806,4.36,18.59,CF71,Bangui,CF714,Bangui-Rapides,point_in_polygon,0.0,Bangui,false,false,CF71,1,relu
+CAF,Paoua,1793,7.25,16.43,CF34,Lim-pendé,CF341,Paoua,point_in_polygon,0.0,Paoua,true,false,,,relu
+CAF,Pétévo,2804,4.35,18.54,CF71,Bangui,CF713,Bangui-Fleuve,point_in_polygon,0.0,Bangui,false,false,CF71,1,relu
 CAF,Sibut,2082,5.73,19.08,CF41,Kémo,CF411,Sibut,point_in_polygon,0.0,Sibut,true,false,CF411,2,auto
 CAF,Yaloké,2065,5.32,17.09,CF11,Ombella M'Poko,CF116,Yaloké,point_in_polygon,0.0,Yaloké,true,false,CF116,2,auto
 CAF,Zemio,2068,5.02,25.13,CF63,Haut-Mbomou,CF633,Zémio,point_in_polygon,0.0,Zémio,true,false,CF633,2,auto
@@ -128,22 +128,22 @@ COG,Betou Centre,3743,3.06,18.52,CG07,Likouala,CG0701,Betou,point_in_polygon,0.0
 COG,Brazzaville,7775,-4.26,15.26,CG02,Brazzaville,CG0201,Brazzaville,point_in_polygon,0.0,Brazzaville,true,false,CG0201,2,auto
 COG,Grand marché/Fond Ntié-Ntié/Nkouikou,707,-4.79,11.85,CG10,Point-Noire,CG1001,Pointe-Noire,point_in_polygon,0.0,Pointe-Noire,true,false,CG1001,2,auto
 COG,Kinkala,2095,-4.36,14.76,CG11,Pool,CG1106,Kinkala,point_in_polygon,0.0,Kinkala,true,false,CG1106,2,auto
-COG,Mikalou,703,-4.26,15.28,CG02,Brazzaville,CG0201,Brazzaville,point_in_polygon,0.0,Brazzaville,true,true,CG0201,2,a_verifier
+COG,Mikalou,703,-4.26,15.28,CG02,Brazzaville,CG0201,Brazzaville,point_in_polygon,0.0,Brazzaville,true,true,CG0201,2,relu
 COG,Monzombo,705,3.43,18.6,CG07,Likouala,CG0701,Betou,point_in_polygon,0.0,Betou,true,false,CG0701,2,auto
-COG,Moungali,701,-4.26,15.28,CG02,Brazzaville,CG0201,Brazzaville,point_in_polygon,0.0,Brazzaville,true,true,CG0201,2,a_verifier
+COG,Moungali,701,-4.26,15.28,CG02,Brazzaville,CG0201,Brazzaville,point_in_polygon,0.0,Brazzaville,true,true,CG0201,2,relu
 COG,Nkayi,1821,-4.18,13.29,CG01,Bouenza,CG0108,Nkayi,point_in_polygon,0.0,Nkayi,true,false,CG0108,2,auto
 COG,Ouenzé,702,-4.25,15.28,CG02,Brazzaville,CG0201,Brazzaville,point_in_polygon,0.0,Brazzaville,true,false,CG0201,2,auto
 COG,Owando,1822,-0.48,15.89,CG03,Cuvette,CG0307,Owando,point_in_polygon,0.0,Owando,true,false,CG0307,2,auto
 COG,Sibiti,1820,-3.68,13.35,CG06,Lekoumou,CG0604,Sibiti,point_in_polygon,0.0,Sibiti,true,false,CG0604,2,auto
-COG,Total,706,-4.26,15.28,CG02,Brazzaville,CG0201,Brazzaville,point_in_polygon,0.0,Brazzaville,true,true,CG0201,2,a_verifier
-GAB,Libreville,2591,0.39,9.45,GA01,Estuaire,GA0104,Libreville,point_in_polygon,0.0,Libreville,true,false,,,a_verifier
+COG,Total,706,-4.26,15.28,CG02,Brazzaville,CG0201,Brazzaville,point_in_polygon,0.0,Brazzaville,true,true,CG0201,2,relu
+GAB,Libreville,2591,0.39,9.45,GA01,Estuaire,GA0104,Libreville,point_in_polygon,0.0,Libreville,true,false,,,relu
 TCD,Abdi,2302,12.81,21.3,TCD21,SILA,TCD2102,Abdi,point_in_polygon,0.0,Abdi,true,false,TCD2102,2,auto
 TCD,Abeche,228,13.82,20.82,TCD14,OUADDAÏ,TCD1401,Ouara,point_in_polygon,0.0,Ouara,true,false,TCD1401,2,auto
 TCD,Aboudeia,2286,11.45,19.28,TCD15,SALAMAT,TCD1502,Aboudeia,point_in_polygon,0.0,Aboudeia,true,false,TCD1502,2,auto
-TCD,Adre,4519,13.46,22.19,TCD14,OUADDAÏ,TCD1403,Assoungha,point_in_polygon,0.0,Assongha,false,false,TCD1403,2,a_verifier
-TCD,Am Timan,1962,11.04,20.28,TCD15,SALAMAT,TCD1501,Bahr Azoum,point_in_polygon,0.0,Barh-Azoum,false,false,TCD1501,2,a_verifier
+TCD,Adre,4519,13.46,22.19,TCD14,OUADDAÏ,TCD1403,Assoungha,point_in_polygon,0.0,Assongha,false,false,TCD1403,2,relu
+TCD,Am Timan,1962,11.04,20.28,TCD15,SALAMAT,TCD1501,Bahr Azoum,point_in_polygon,0.0,Barh-Azoum,false,false,TCD1501,2,relu
 TCD,Am-Zoer,2707,14.22,21.39,TCD17,WADI FIRA,TCD1701,Biltine,point_in_polygon,0.0,Biltine,true,false,TCD1701,2,auto
-TCD,Amdam,2301,12.76,20.47,TCD14,OUADDAÏ,TCD1402,Djourf Al Ahmar,point_in_polygon,0.0,Djourouf Al Ahmar,false,false,TCD1402,2,a_verifier
+TCD,Amdam,2301,12.76,20.47,TCD14,OUADDAÏ,TCD1402,Djourf Al Ahmar,point_in_polygon,0.0,Djourouf Al Ahmar,false,false,TCD1402,2,relu
 TCD,Amdjarass,4517,16.17,22.83,TCD20,ENNEDI EST,TCD2001,Amdjarass,point_in_polygon,0.0,Amdjarass,true,false,TCD2001,2,auto
 TCD,Ati,2279,13.21,18.33,TCD01,BATHA,TCD0101,Batha Ouest,point_in_polygon,0.0,Batha-Ouest,true,false,TCD0101,2,auto
 TCD,Bagassola,4514,13.55,14.3,TCD07,LAC,TCD0703,Kaya,point_in_polygon,0.0,Kaya,true,false,TCD0703,2,auto
@@ -151,7 +151,7 @@ TCD,Bardai,6103,21.35,17.0,TCD22,TIBESTI,TCD2201,Tibesti Est,point_in_polygon,0.
 TCD,Bebedja,2708,8.67,16.57,TCD09,LOGONE ORIENTAL,TCD0904,La nya,point_in_polygon,0.0,La Nya,true,false,TCD0904,2,auto
 TCD,Beboto,2709,8.26,16.93,TCD09,LOGONE ORIENTAL,TCD0903,Kouh Ouest,point_in_polygon,0.0,Kouh-Ouest,true,false,TCD0903,2,auto
 TCD,Bedjondo,4509,8.61,17.19,TCD10,MANDOUL,TCD1003,Mandoul Occidental,point_in_polygon,0.0,Mandoul Occidental,true,false,TCD1003,2,auto
-TCD,Benoye,2292,8.99,16.32,TCD08,LOGONE OCCIDENTAL,TCD0804,Ngourkosso,point_in_polygon,0.0,Ngourkoussou,false,false,TCD0804,2,a_verifier
+TCD,Benoye,2292,8.99,16.32,TCD08,LOGONE OCCIDENTAL,TCD0804,Ngourkosso,point_in_polygon,0.0,Ngourkoussou,false,false,TCD0804,2,relu
 TCD,Bere,4508,9.31,16.15,TCD16,TANDJILÉ,TCD1603,Tandjilé Centre,point_in_polygon,0.0,Tandjile-Centre,true,false,TCD1603,2,auto
 TCD,Biltine,2294,14.54,20.91,TCD17,WADI FIRA,TCD1701,Biltine,point_in_polygon,0.0,Biltine,true,false,TCD1701,2,auto
 TCD,Binder,8408,9.96,14.47,TCD12,MAYO KEBBI OUEST,TCD1203,Mayo Binder,point_in_polygon,0.0,Mayo Binder,true,false,TCD1203,2,auto
@@ -163,51 +163,51 @@ TCD,Bongor,1964,10.28,15.39,TCD11,MAYO KEBBI EST,TCD1101,Mayo Boneye,point_in_po
 TCD,Bousso,2287,10.48,16.71,TCD03,CHARI BAGUIRMI,TCD0303,Loug Chari,point_in_polygon,0.0,Loug-Chari,true,false,TCD0303,2,auto
 TCD,Danamadji,5618,8.75,18.55,TCD13,MOYEN CHARI,TCD1302,Grande Sido,point_in_polygon,0.0,Grande Sido,true,false,TCD1302,2,auto
 TCD,Dembe,11368,12.1,15.08,TCD18,N'DJAMENA,TCD1801,N'Djamena,point_in_polygon,0.0,Ndjamena,true,false,TCD1801,2,auto
-TCD,Doba,2293,8.67,16.86,TCD09,LOGONE ORIENTAL,TCD0901,La pendé,point_in_polygon,0.0,La Pend,false,false,TCD0901,2,a_verifier
+TCD,Doba,2293,8.67,16.86,TCD09,LOGONE ORIENTAL,TCD0901,La pendé,point_in_polygon,0.0,La Pend,false,false,TCD0901,2,relu
 TCD,Dourbali,4500,11.79,15.86,TCD03,CHARI BAGUIRMI,TCD0301,Baguirmi,point_in_polygon,0.0,Baguirmi,true,false,TCD0301,2,auto
 TCD,Fada,6104,17.18,21.58,TCD23,ENNEDI OUEST,TCD2301,Fada,point_in_polygon,0.0,Fada,true,false,TCD2301,2,auto
-TCD,Faya,4498,17.92,19.11,TCD02,BORKOU,TCD0202,Borkou Yala,point_in_polygon,0.0,Borkou,false,false,TCD02,1,a_verifier
+TCD,Faya,4498,17.92,19.11,TCD02,BORKOU,TCD0202,Borkou Yala,point_in_polygon,0.0,Borkou,false,false,TCD02,1,relu
 TCD,Fianga,2711,9.92,15.12,TCD11,MAYO KEBBI EST,TCD1104,Mont Illi,point_in_polygon,0.0,Mont Illi,true,false,TCD1104,2,auto
-TCD,Gore,236,7.92,16.63,TCD09,LOGONE ORIENTAL,TCD0905,La Nya pendé,point_in_polygon,0.0,La Nya Pendm,false,false,TCD0905,2,a_verifier
+TCD,Gore,236,7.92,16.63,TCD09,LOGONE ORIENTAL,TCD0905,La Nya pendé,point_in_polygon,0.0,La Nya Pendm,false,false,TCD0905,2,relu
 TCD,Goz Beida,2290,12.23,21.41,TCD21,SILA,TCD2101,Kimiti,point_in_polygon,0.0,Kimiti,true,false,TCD2101,2,auto
-TCD,Gueledeng,2712,10.92,15.54,TCD11,MAYO KEBBI EST,TCD1103,Mayo Lemyé,point_in_polygon,0.0,Mayo-Lemi,false,false,TCD1103,2,a_verifier
+TCD,Gueledeng,2712,10.92,15.54,TCD11,MAYO KEBBI EST,TCD1103,Mayo Lemyé,point_in_polygon,0.0,Mayo-Lemi,false,false,TCD1103,2,relu
 TCD,Guereda,2713,14.52,22.09,TCD17,WADI FIRA,TCD1702,Dar Tama,point_in_polygon,0.0,Dar-Tama,true,false,TCD1702,2,auto
 TCD,Haraze Mangueigne,2720,9.95,20.91,TCD15,SALAMAT,TCD1503,Haraze Mangueigne,point_in_polygon,0.0,Haraze Mangueigne,true,false,TCD1503,2,auto
-TCD,Iriba,2300,15.13,22.25,TCD17,WADI FIRA,TCD1703,Kobé,point_in_polygon,0.0,Iriba,false,false,TCD1703,2,a_verifier
-TCD,Kalait,4493,20.84,15.85,TCD22,TIBESTI,TCD2202,Tibesti Ouest,point_in_polygon,0.0,Tibest-Ouest,false,false,TCD2202,2,a_verifier
+TCD,Iriba,2300,15.13,22.25,TCD17,WADI FIRA,TCD1703,Kobé,point_in_polygon,0.0,Iriba,false,false,TCD1703,2,relu
+TCD,Kalait,4493,20.84,15.85,TCD22,TIBESTI,TCD2202,Tibesti Ouest,point_in_polygon,0.0,Tibest-Ouest,false,false,TCD2202,2,relu
 TCD,Koumra,2282,8.92,17.55,TCD10,MANDOUL,TCD1001,Mandoul Oriental,point_in_polygon,0.0,Mandoul Oriental,true,false,TCD1001,2,auto
 TCD,Krim Krim,2714,8.97,15.8,TCD08,LOGONE OCCIDENTAL,TCD0803,Gueni,point_in_polygon,0.0,Gueni,true,false,TCD0803,2,auto
 TCD,Kyabe,2281,9.45,18.94,TCD13,MOYEN CHARI,TCD1303,Lac Iro,point_in_polygon,0.0,Lac Iro,true,false,TCD1303,2,auto
 TCD,Kélo,1963,9.31,15.8,TCD16,TANDJILÉ,TCD1602,Tandjilé Ouest,point_in_polygon,0.0,Tandjile-Ouest,true,false,TCD1602,2,auto
 TCD,Laï,2289,9.4,16.31,TCD16,TANDJILÉ,TCD1601,Tandjilé Est,point_in_polygon,0.0,Tandjile-Est,true,false,TCD1601,2,auto
-TCD,Lere,2721,9.66,14.22,TCD12,MAYO KEBBI OUEST,TCD1202,Lac Léré,point_in_polygon,0.0,Lac-LBrn,false,false,TCD1202,2,a_verifier
+TCD,Lere,2721,9.66,14.22,TCD12,MAYO KEBBI OUEST,TCD1202,Lac Léré,point_in_polygon,0.0,Lac-LBrn,false,false,TCD1202,2,relu
 TCD,Mandelia,2299,11.73,15.24,TCD03,CHARI BAGUIRMI,TCD0302,Chari,point_in_polygon,0.0,Chari,true,false,TCD0302,2,auto
-TCD,Mangalme,2715,12.36,19.61,TCD04,GUÉRA,TCD0404,Mangalmé,point_in_polygon,0.0,Mangalma,false,false,TCD0404,2,a_verifier
+TCD,Mangalme,2715,12.36,19.61,TCD04,GUÉRA,TCD0404,Mangalmé,point_in_polygon,0.0,Mangalma,false,false,TCD0404,2,relu
 TCD,Mao,230,14.12,15.31,TCD06,KANEM,TCD0601,Kanem,point_in_polygon,0.0,Kanem,true,false,TCD0601,2,auto
 TCD,Maro,2285,8.42,18.77,TCD13,MOYEN CHARI,TCD1302,Grande Sido,point_in_polygon,0.0,Grande Sido,true,false,TCD1302,2,auto
 TCD,Massaguet,2716,12.48,15.44,TCD05,HADJER LAMIS,TCD0503,Haraze Al Biar,point_in_polygon,0.0,Haraze-Al-Biar,true,false,TCD0503,2,auto
 TCD,Massakory,2295,13.0,15.73,TCD05,HADJER LAMIS,TCD0501,Dagana,point_in_polygon,0.0,Dagana,true,false,TCD0501,2,auto
 TCD,Massenya,2717,11.4,16.17,TCD03,CHARI BAGUIRMI,TCD0301,Baguirmi,point_in_polygon,0.0,Baguirmi,true,false,TCD0301,2,auto
 TCD,Mbaïbokoum,2303,7.74,15.69,TCD09,LOGONE ORIENTAL,TCD0906,Monts de lam,point_in_polygon,0.0,Monts de Lam,true,false,TCD0906,2,auto
-TCD,Mbaïnamar,2298,8.67,15.38,TCD08,LOGONE OCCIDENTAL,TCD0802,Djode,point_in_polygon,0.0,Dodje,false,false,TCD0802,2,a_verifier
-TCD,Melfi,2755,11.06,17.93,TCD04,GUÉRA,TCD0403,Bahar Signaka,point_in_polygon,0.0,Barh-Signaka,false,false,TCD0403,2,a_verifier
+TCD,Mbaïnamar,2298,8.67,15.38,TCD08,LOGONE OCCIDENTAL,TCD0802,Djode,point_in_polygon,0.0,Dodje,false,false,TCD0802,2,relu
+TCD,Melfi,2755,11.06,17.93,TCD04,GUÉRA,TCD0403,Bahar Signaka,point_in_polygon,0.0,Barh-Signaka,false,false,TCD0403,2,relu
 TCD,Moissala,2283,8.34,17.76,TCD10,MANDOUL,TCD1002,Barh Sara,point_in_polygon,0.0,Barh-Sara,true,false,TCD1002,2,auto
 TCD,Mondo,2718,13.78,15.53,TCD06,KANEM,TCD0603,Wadi Bissam,point_in_polygon,0.0,Wadi-Bissam,true,false,TCD0603,2,auto
 TCD,Mongo,231,12.18,18.69,TCD04,GUÉRA,TCD0401,Guéra,point_in_polygon,0.0,Guera,true,false,TCD0401,2,auto
-TCD,Moundou,232,8.57,16.08,TCD09,LOGONE ORIENTAL,TCD0906,Monts de lam,point_in_polygon,0.0,Lac Wey,false,false,TCD0906,2,a_verifier
+TCD,Moundou,232,8.5667,16.0833,TCD09,LOGONE ORIENTAL,TCD0906,Monts de lam,point_in_polygon,0.0,Lac Wey,false,false,TCD0906,2,a_verifier
 TCD,Moussoro,233,13.64,16.49,TCD19,BARH EL GAZEL,TCD1901,Barh El Gazel Sud,point_in_polygon,0.0,Barh El Gazel Sud,true,false,TCD1901,2,auto
 TCD,N'djamena (Atrone),4515,12.09,15.13,TCD18,N'DJAMENA,TCD1801,N'Djamena,point_in_polygon,0.0,Ndjamena,true,false,TCD1801,2,auto
-TCD,National Average,1965,,,,,,,sans_coordonnees,,,false,false,,,a_verifier
+TCD,National Average,1965,,,,,,,sans_coordonnees,,,false,false,,,exclu
 TCD,Ndjamena,234,12.11,15.04,TCD18,N'DJAMENA,TCD1801,N'Djamena,point_in_polygon,0.0,Ndjamena,true,false,TCD1801,2,auto
 TCD,Ndjamena (Marche A Mil),4480,12.11,15.06,TCD18,N'DJAMENA,TCD1801,N'Djamena,point_in_polygon,0.0,Ndjamena,true,false,TCD1801,2,auto
 TCD,Ngouri,2297,13.64,15.37,TCD07,LAC,TCD0702,Wayi,point_in_polygon,0.0,Wayi,true,false,TCD0702,2,auto
 TCD,Nokou,2291,14.58,14.78,TCD06,KANEM,TCD0602,Nord Kanem,point_in_polygon,0.0,Nord-Kanem,true,false,TCD0602,2,auto
-TCD,Oum Hadjer,2280,,,,,,,sans_coordonnees,,,false,false,,,a_verifier
+TCD,Oum Hadjer,2280,13.295,19.6966,TCD01,BATHA,TCD0102,Batha Est,point_in_polygon,0.0,,false,false,TCD0102,2,a_verifier
 TCD,Oumhadjer,5623,13.23,19.24,TCD01,BATHA,TCD0102,Batha Est,point_in_polygon,0.0,Batha-Est,true,false,TCD0102,2,auto
 TCD,Pala,2288,9.37,14.91,TCD12,MAYO KEBBI OUEST,TCD1201,Mayo Dallah,point_in_polygon,0.0,Mayo-Dallah,true,false,TCD1201,2,auto
 TCD,Peni,2284,8.8,17.3,TCD10,MANDOUL,TCD1003,Mandoul Occidental,point_in_polygon,0.0,Mandoul Occidental,true,false,TCD1003,2,auto
-TCD,Pont Karol,4473,9.59,15.49,TCD11,MAYO KEBBI EST,TCD1102,La kabbia,point_in_polygon,0.0,Kabia,false,false,TCD1102,2,a_verifier
-TCD,Sarh,235,9.14,18.39,TCD13,MOYEN CHARI,TCD1301,Bahr Koh,point_in_polygon,0.0,Barh-K h,false,false,TCD1301,2,a_verifier
+TCD,Pont Karol,4473,9.59,15.49,TCD11,MAYO KEBBI EST,TCD1102,La kabbia,point_in_polygon,0.0,Kabia,false,false,TCD1102,2,relu
+TCD,Sarh,235,9.14,18.39,TCD13,MOYEN CHARI,TCD1301,Bahr Koh,point_in_polygon,0.0,Barh-K h,false,false,TCD1301,2,relu
 TCD,Sido,4471,8.25,18.71,TCD13,MOYEN CHARI,TCD1302,Grande Sido,point_in_polygon,0.0,Grande Sido,true,false,TCD1302,2,auto
 TCD,Yao,2722,12.85,17.56,TCD01,BATHA,TCD0103,Fitri,point_in_polygon,0.0,Fitri,true,false,TCD0103,2,auto
-TCD,Zouar,6102,20.46,16.53,TCD22,TIBESTI,TCD2202,Tibesti Ouest,point_in_polygon,0.0,Tibest-Ouest,false,false,TCD2202,2,a_verifier
+TCD,Zouar,6102,20.46,16.53,TCD22,TIBESTI,TCD2202,Tibesti Ouest,point_in_polygon,0.0,Tibest-Ouest,false,false,TCD2202,2,relu

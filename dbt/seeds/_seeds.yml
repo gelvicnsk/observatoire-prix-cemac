@@ -100,4 +100,4 @@ seeds:
       - name: status
         data_tests:
           - accepted_values:
-              arguments: {values: ['auto', 'relu', 'a_verifier']}
+              arguments: {values: ['auto', 'relu', 'a_verifier', 'exclu']}

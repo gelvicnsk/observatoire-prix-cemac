@@ -13,12 +13,12 @@ unit_raw,quantity,base_unit,factor_to_base,status,note
 5 KG,5.0,kg,5.0,converti,
 50 KG,50.0,kg,50.0,converti,
 90 KG,90.0,kg,90.0,converti,
-Day,,,,a_verifier,unité non reconnue
+Day,,,,exclu,salaire journalier
 Head,,,,exclu,"bétail vendu sur pied, hors panier alimentaire"
 KG,1.0,kg,1.0,converti,
 L,1.0,l,1.0,converti,
-Package,,,,a_verifier,unité non reconnue
+Package,,piece,,sans_poids,"paquet, poids inconnu"
 Packet,,piece,,sans_poids,"mesure locale, poids inconnu"
 Sack,,piece,,sans_poids,"mesure locale, poids inconnu"
-USD/LCU,,,,a_verifier,unité non reconnue
+USD/LCU,,,,exclu,taux de change
 Unit,1.0,piece,1.0,sans_poids,comptage

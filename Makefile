@@ -10,7 +10,7 @@ DBT := dbt
 ENV ?= dev
 MONTH ?= $(shell date -d "last month" +%Y-%m)
 
-.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run backfill seeds-reference seeds-markets dbt-deps dbt-build dbt-freshness dbt-docs
+.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run backfill seeds-reference seeds-markets seeds-review dbt-deps dbt-build dbt-freshness dbt-docs
 
 help:
 	@grep -E '^[a-z-]+:' Makefile | cut -d: -f1
@@ -71,7 +71,10 @@ seeds-reference:    ## étape 5B : propose les seeds unit_conversion et commodit
 	python -m scripts.build_reference_seeds --project $(GCP_PROJECT_ID)
 
 seeds-markets:      ## étape 5B : rattache les marchés aux districts COD-AB (seed market_district)
-	python -m scripts.map_markets_to_districts --project $(GCP_PROJECT_ID)
+	python -m scripts.map_markets_to_districts --project $(GCP_PROJECT_ID) $(ARGS)
+
+seeds-review:       ## étape 5B : applique la relecture versionnée (reference/review/*.csv)
+	python -m scripts.apply_review
 
 dbt-deps:           ## étape 5 : paquets dbt (dbt_utils, version figée)
 	$(DBT) deps

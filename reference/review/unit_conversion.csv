@@ -1,0 +1,4 @@
+unit_raw,base_unit,status,note,review_note
+Day,,exclu,salaire journalier,Unité des produits Wage : hors panier alimentaire
+USD/LCU,,exclu,taux de change,Unité du produit Exchange rate : pas un prix
+Package,piece,sans_poids,"paquet, poids inconnu",Produits non alimentaires (lessive)

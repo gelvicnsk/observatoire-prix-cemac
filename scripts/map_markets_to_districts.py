@@ -18,6 +18,7 @@ Usage : python -m scripts.map_markets_to_districts [--project obs-cemac-dev-1125
 from __future__ import annotations
 
 import argparse
+import csv
 import io
 import json
 import math
@@ -27,7 +28,7 @@ import sys
 import unicodedata
 import zipfile
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from shapely import STRtree
@@ -37,6 +38,7 @@ from shapely.geometry.base import BaseGeometry
 from scripts.seed_files import update_seed
 
 SEED_PATH = Path("dbt/seeds/market_district.csv")
+COORDINATES_PATH = Path("reference/market_coordinates.csv")
 CACHE_DIR = Path("data/cod_ab")
 MAX_DISTANCE_KM = 10.0
 KM_PER_DEGREE = 111.32
@@ -242,6 +244,25 @@ def match_markets(
     return rows
 
 
+def apply_coordinates(markets: list[Market], path: Path) -> tuple[list[Market], int]:
+    """Remplace les coordonnées absentes ou fausses du PAM par celles de reference/market_coordinates.csv."""
+    if not path.exists():
+        return markets, 0
+    with path.open(newline="", encoding="utf-8") as handle:
+        fixes = {(r["country_iso3"], r["market_name"]): r for r in csv.DictReader(handle)}
+    known = {(m.country_iso3, m.market_name) for m in markets}
+    missing = sorted(set(fixes) - known)
+    if missing:
+        raise ValueError(f"{path} : marchés inconnus {missing}")
+    fixed = [
+        replace(m, latitude=float(f["latitude"]), longitude=float(f["longitude"]))
+        if (f := fixes.get((m.country_iso3, m.market_name)))
+        else m
+        for m in markets
+    ]
+    return fixed, len(fixes)
+
+
 # --------------------------------------------------------------------------------------------------
 # BigQuery
 # --------------------------------------------------------------------------------------------------
@@ -285,12 +306,16 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--project", default=os.environ.get("GCP_PROJECT_ID"))
     parser.add_argument("--seed", type=Path, default=SEED_PATH)
-    parser.add_argument("--replace", action="store_true", help="régénère tout le seed (perd les corrections)")
+    parser.add_argument("--coordinates", type=Path, default=COORDINATES_PATH, help="coordonnées corrigées")
+    parser.add_argument("--replace", action="store_true", help="régénère tout le seed (relancer ensuite la relecture)")
     args = parser.parse_args(argv)
     if not args.project:
         parser.error("indiquer --project ou GCP_PROJECT_ID")
 
     markets, pcodes = read_bigquery(args.project)
+    markets, fixed = apply_coordinates(markets, args.coordinates)
+    if fixed:
+        print(f"{fixed} marchés avec des coordonnées corrigées ({args.coordinates})")
     countries = sorted({m.country_iso3 for m in markets})
     layers = {iso3: fetch_cod_ab(iso3) for iso3 in countries}
     rows = match_markets(markets, layers, pcodes)
