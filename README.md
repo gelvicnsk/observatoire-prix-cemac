@@ -6,6 +6,45 @@ les normalise et signale les hausses anormales par marché et par produit.
 > Projet personnel. Données publiques réelles (Programme alimentaire mondial via HDX : prix et pluviométrie CHIRPS,
 > Banque mondiale, Banque centrale européenne). Aucune donnée n'est modifiée à la main : chaque règle de normalisation est versionnée.
 
+## En bref
+
+| | |
+|---|---|
+| **Données** | 240 589 prix mensuels, 211 marchés, 5 pays (2003 → 2026) ; 103 produits du PAM ramenés à 100 noms français ; pluie CHIRPS de 5 pays depuis 1981 |
+| **Qualité** | 114 contrôles dbt à chaque exécution, dont 6 tests d'anomalie et de schéma Elementary ; prix recalculés en Python à l'identique (0 écart sur 240 589 lignes) |
+| **Alertes** | hausse anormale = z-score ET hausse sur 1 mois, seuils calibrés sur les données : environ 20 alertes par mois au Tchad, 6 au Cameroun, 3 en Centrafrique |
+| **Plateforme** | GCP en Terraform (dev et prod) ; deux Cloud Run Jobs lancés chaque mois par Cloud Scheduler ; BigQuery bronze → silver → gold |
+| **CI/CD** | 5 contrôles obligatoires sur chaque pull request ; déploiement dev avec test de fumée, puis prod après validation ; aucune clé de service (Workload Identity) |
+| **Décisions** | 11 ADR dans [`docs/decisions/`](docs/decisions/) |
+
+```mermaid
+flowchart LR
+    subgraph SRC["Sources publiques"]
+        HDX["HDX : prix PAM,<br/>pluie CHIRPS"]
+        WB["Banque mondiale"]
+        ECB["BCE : change"]
+    end
+    subgraph GCP["Google Cloud (dev et prod, Terraform)"]
+        SCH["Cloud Scheduler<br/>le 5 du mois"]
+        ING["Cloud Run Job<br/>obs-ingestion"]
+        RAW[("Cloud Storage<br/>raw, Parquet")]
+        subgraph BQ["BigQuery"]
+            BR["bronze<br/>tables externes"] --> SI["silver<br/>normalisé"] --> GO["gold<br/>faits, alertes"]
+            EL["elementary<br/>historique des contrôles"]
+        end
+        TR["Cloud Run Job<br/>obs-transform<br/>dbt + rapprochement"]
+        REP[("Cloud Storage<br/>rapports Elementary")]
+    end
+    LS["Looker Studio"]
+    HDX & WB & ECB --> ING --> RAW --> BR
+    SCH --> ING
+    SCH --> TR
+    TR --> SI
+    TR --> EL
+    TR --> REP
+    GO --> LS
+```
+
 ---
 
 ## Sommaire
@@ -56,7 +95,7 @@ qu'un prix dérape sur un marché.
 | 5. dbt silver et gold | 5A staging · 5B référentiels · 5C faits, dimensions, contrat | Terminée |
 | 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | Terminée |
 | 7. Déploiement continu | Image, Artifact Registry, Cloud Run Jobs, Scheduler, dev puis prod | Terminée |
-| 8. Tableau de bord et documentation | Elementary, Looker Studio, schémas, décisions | En cours (Elementary) |
+| 8. Tableau de bord et documentation | Elementary, Looker Studio, schémas, décisions | En cours (Elementary et tables du tableau de bord terminés) |
 
 ## 3. Périmètre : ce que les données contiennent vraiment
 
@@ -137,7 +176,7 @@ gs://<bucket-raw>/wfp/country=COG/ingest_date=2026-11-13/<sha>.parquet         t
 ### Flux des données (une fois par mois)
 
 ```
- Cloud Scheduler (le 1er du mois)
+ Cloud Scheduler (le 5 du mois)
         │
         ▼
  ┌──────────────────────┐    ┌───────────────────────────────┐
@@ -157,14 +196,14 @@ gs://<bucket-raw>/wfp/country=COG/ingest_date=2026-11-13/<sha>.parquet         t
                                         │                 │
                          Job dbt (Cloud Run Job)          ▼
                          build + tests + rapprochement  Looker Studio
-                                                        (carte, alertes)
+                         + rapport Elementary           (carte, alertes)
 ```
 
 ### Flux de déploiement (à chaque modification du code)
 
 ```
- Pull request ──▶ CI : ruff, sqlfluff, pytest, terraform plan (en commentaire),
-                      dbt Slim CI sur le dataset ci, build + scan de l'image
+ Pull request ──▶ CI : ruff, pytest, gitleaks, terraform plan (en commentaire),
+                      dbt Slim CI sur le dataset ci, construction de l'image
         │
         ▼ fusion sur main
  CD : terraform apply (dev) ──▶ image étiquetée par commit ──▶ Artifact Registry
@@ -194,8 +233,11 @@ Cloud Scheduler et deux Cloud Run Jobs suffisent.
 | `dim_commodity` | un produit | Nom normalisé (FR), catégorie, unité de référence, noms d'origine |
 | `dim_country` | un pays | Code ISO, statut des données (actif, historique, absent) |
 | `dim_month` | un mois | Année, trimestre |
-| `mart_price_alerts` | un marché, un produit, un mois en alerte | Variation sur 1 et 12 mois, z-score, niveau d'alerte |
-| `mart_rain_vs_price` | un marché, un mois | Pluie du district du marché, anomalie CHIRPS sur 1 et 3 mois, prix du panier |
+| `mart_price_metrics` | une série de prix, un mois | Variation sur 1 et 12 mois, moyenne et écart type des 24 mois précédents, z-score, niveau d'alerte |
+| `mart_price_alerts` | un marché, un produit, un mois en alerte | Les lignes en alerte, avec les noms du marché, du produit et du pays |
+| `mart_rain_vs_price` | un marché, un mois | Indice de prix au détail (médiane, 100 = prix habituel), alertes, pluie du district en % de la normale sur 1 et 3 mois |
+| `mart_price_dashboard` | un prix mensuel | Prix, noms, position du marché et indicateurs : la source du tableau de bord |
+| `mart_data_freshness` | un pays | Dernier relevé, pays actif en retard |
 
 `fct_price_monthly` est partitionnée par mois et clusterisée par pays et produit ; les modèles volumineux
 sont incrémentaux (stratégie `merge` sur la clé de grain).
@@ -314,7 +356,12 @@ make dbt-deps     # étape 5 : paquets dbt
 make dbt-build    # seeds, modèles silver/gold et tests sur dev
 make dbt-freshness
 make dbt-docs     # documentation et lineage sur http://localhost:8081
+make reconcile    # étape 6 : prix recalculés en Python depuis bronze, comparés à dbt
+make elementary-report   # étape 8 : rapport Elementary dans data/elementary/report.html
 ```
+
+En dev et en prod, rien n'est lancé à la main : le CD déploie à chaque fusion sur `main`, et Cloud Scheduler
+exécute le pipeline chaque mois (section 9).
 
 Sorties de l'inventaire : `docs/data_profile.md` (versionné), `data/profile/units.csv`,
 `data/profile/commodities.csv` et `data/profile/profile.json` (non versionnés).
@@ -325,12 +372,15 @@ Sorties de l'inventaire : `docs/data_profile.md` (versionné), `data/profile/uni
 .
 ├── .github/workflows/     # ci.yml, cd.yml, backfill.yml
 ├── infra/                 # Terraform : bootstrap/, modules/, envs/dev, envs/prod
-├── ingestion/             # job Python (image n° 1) : src/ingestion, tests/
-├── dbt/                   # transformations (image n° 2) : seeds, models, macros, tests
-├── quality/               # rapprochement pandas / dbt
-├── scripts/               # profile_sources.py, run_local.sh, backfill.sh
-├── dashboard/             # lien et requêtes Looker Studio
-└── docs/                  # data_profile.md, architecture, runbook, coûts, décisions (ADR)
+├── Dockerfile             # image unique du pipeline (ingestion, dbt, rapprochement, rapport)
+├── pipeline/              # point d'entrée des Cloud Run Jobs, envoi du rapport Elementary
+├── ingestion/             # job d'ingestion Python : src/ingestion, tests/
+├── dbt/                   # transformations : seeds, models (staging, intermediate, marts), macros, tests
+├── quality/               # rapprochement Python indépendant de dbt
+├── reference/             # relecture versionnée des référentiels, coordonnées corrigées
+├── scripts/               # inventaire, génération des référentiels, rattachement des marchés
+├── dashboard/             # tableau de bord Looker Studio
+└── docs/                  # data_profile.md, dashboard.md, décisions (ADR)
 ```
 
 ## 12. Livrables, critères de réussite, risques et coûts
