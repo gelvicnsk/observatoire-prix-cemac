@@ -22,7 +22,16 @@ vars:
   alert_change_1m_strong_pct: 40    # ... et hausse sur 1 mois >= 40 %
   freshness_stale_months: 3         # pays actif sans nouveau relevé depuis 3 mois : signalé
 
+# Elementary remplace la matérialisation des tests pour en garder les résultats : dbt 1.8+ exige de
+# l'autoriser explicitement.
+flags:
+  require_explicit_package_overrides_for_builtin_materializations: false
+
 models:
+  # Tables d'Elementary dans le dataset elementary, sauf en CI : la CI ne doit pas remplir l'historique
+  elementary:
+    +schema: elementary
+    +enabled: "{{ target.name != 'ci' }}"
   observatoire_cemac:
     +persist_docs:
       relation: true

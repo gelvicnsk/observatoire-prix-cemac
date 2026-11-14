@@ -14,6 +14,7 @@ locals {
   env = {
     GCP_PROJECT_ID = var.project_id
     GCS_RAW_BUCKET = var.raw_bucket
+    REPORTS_BUCKET = var.reports_bucket
     BQ_LOCATION    = var.bq_location
     DBT_TARGET     = var.dbt_target
   }

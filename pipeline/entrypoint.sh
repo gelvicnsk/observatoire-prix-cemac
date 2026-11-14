@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Point d'entrée de l'image (étape 7). Une étape par Cloud Run Job :
 #   ingest     sources publiques -> bucket raw, tables externes bronze, journal meta
-#   transform  dbt (seeds, modèles, 118 contrôles) puis rapprochement Python indépendant
+#   transform  dbt (seeds, modèles, contrôles) puis rapprochement Python indépendant, puis rapport Elementary
 # Toute erreur arrête le job avec un code non nul : l'exécution apparaît en échec dans Cloud Run.
 # Variables attendues : GCP_PROJECT_ID, GCS_RAW_BUCKET, BQ_LOCATION, DBT_TARGET (dev ou prod).
 set -euo pipefail
@@ -25,6 +25,14 @@ case "$step" in
     cd /app
     echo "== rapprochement Python / dbt"
     python -m quality.reconcile --project "$GCP_PROJECT_ID" --bucket "$GCS_RAW_BUCKET"
+    # Le rapport ne doit jamais faire échouer le job : les contrôles ont déjà tous tourné
+    echo "== rapport Elementary"
+    if edr report --project-dir /app/dbt --profiles-dir /app/dbt --profile-target "$target" \
+         --file-path /tmp/elementary_report.html --open-browser false; then
+      python -m pipeline.publish_report /tmp/elementary_report.html || echo "rapport : envoi impossible"
+    else
+      echo "rapport : génération impossible, voir ci-dessus"
+    fi
     ;;
   *)
     echo "usage : entrypoint.sh ingest|transform" >&2

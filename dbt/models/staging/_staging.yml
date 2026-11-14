@@ -7,6 +7,15 @@ version: 2
 models:
   - name: stg_wfp__prices
     description: Prix du PAM (dernière version par pays), renommés et typés.
+    data_tests:
+      # Elementary : nombre de lignes de chaque pays comparé aux exécutions précédentes. Détecte un fichier
+      # du PAM tronqué, qu'aucun contrôle de cohérence ne voit (« warn » le temps de constituer l'historique).
+      - elementary.dimension_anomalies:
+          arguments:
+            dimensions: [country_iso3]
+          config:
+            severity: warn
+            enabled: "{{ target.name != 'ci' }}"
     columns:
       - name: price_observation_id
         description: Clé technique (pays, marché, produit, unité, type de prix, indicateur, date).
@@ -51,6 +60,12 @@ models:
   - name: stg_chirps__rainfall_dekads
     description: Pluie CHIRPS par unité administrative et par décade (dernière version par pays).
     data_tests:
+      - elementary.dimension_anomalies:
+          arguments:
+            dimensions: [country_iso3]
+          config:
+            severity: warn
+            enabled: "{{ target.name != 'ci' }}"
       # un code peut être porté par deux zones du PAM (2 cas au Tchad) : la clé de la source est l'identifiant
       # de zone ; le dédoublonnage par code se fait dans int_chirps__rainfall_dekads
       - dbt_utils.unique_combination_of_columns:

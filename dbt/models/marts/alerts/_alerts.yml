@@ -27,6 +27,16 @@ models:
 
   - name: mart_price_alerts
     description: Les mois en alerte, avec les noms du marché, du produit et du pays.
+    data_tests:
+      # Un mois avec beaucoup plus d'alertes que d'habitude : crise réelle ou défaut de données, à regarder
+      - elementary.volume_anomalies:
+          config:
+            severity: warn
+            enabled: "{{ target.name != 'ci' }}"
+      - elementary.schema_changes:
+          config:
+            severity: warn
+            enabled: "{{ target.name != 'ci' }}"
     columns:
       - name: price_monthly_id
         data_tests: [unique, not_null]

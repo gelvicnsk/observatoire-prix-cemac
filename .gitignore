@@ -35,3 +35,4 @@ data/
 !infra/envs/*/terraform.tfvars
 tfplan
 dbt/.user.yml
+edr_target/
