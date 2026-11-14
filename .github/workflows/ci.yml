@@ -3,6 +3,7 @@
 #   secrets   recherche de secrets dans tout l'historique (gitleaks)
 #   terraform fmt, validate, puis plan sur dev publié en commentaire de la pull request
 #   dbt       build des modèles modifiés (et de leurs descendants) dans le dataset ci (Slim CI)
+#   image     construction de l'image Docker du pipeline, et démarrage à vide
 # L'accès à Google Cloud passe par le pool github-plan, sans aucune clé : tf-plan en lecture seule,
 # sa-dbt-ci qui ne peut écrire que dans le dataset ci.
 name: ci
@@ -30,9 +31,9 @@ jobs:
     name: Python (ruff + pytest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -53,11 +54,11 @@ jobs:
     name: Recherche de secrets
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: gitleaks/gitleaks-action@v2
+      - uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -74,9 +75,9 @@ jobs:
       TF_VAR_billing_account: ${{ secrets.GCP_BILLING_ACCOUNT }}
       TF_VAR_budget_currency: ${{ vars.BUDGET_CURRENCY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.17.2"
           terraform_wrapper: false
@@ -92,7 +93,7 @@ jobs:
           done
 
       - name: Authentification Google Cloud (sans clé)
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ vars.WIF_PROVIDER_PLAN }}
           service_account: ${{ vars.TF_PLAN_SA }}
@@ -106,7 +107,7 @@ jobs:
 
       - name: Publier le plan dans la pull request
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
@@ -138,15 +139,15 @@ jobs:
       DBT_PROFILES_DIR: ${{ github.workspace }}/dbt
       DBT_SELECT: ${{ inputs.dbt_select || 'state:modified+' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # L'état de référence : le projet dbt tel qu'il est sur main
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: main
           path: reference-main
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -169,7 +170,7 @@ jobs:
           cp target/manifest.json "${{ github.workspace }}/state/"
 
       - name: Authentification Google Cloud (sans clé)
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ vars.WIF_PROVIDER_PLAN }}
           service_account: ${{ vars.DBT_CI_SA }}
@@ -194,3 +195,24 @@ jobs:
             grep -E "Done\.|Nothing to do|ERROR|FAIL|WARN" build.log | tail -20 || echo "(pas de journal)"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+  image:
+    name: Image Docker (build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Le CD construit cette image après la fusion : on vérifie avant qu'elle se construit et démarre
+      - name: Construire
+        run: docker build -t pipeline:ci .
+
+      - name: Démarrer sans argument (doit refuser avec le code 2)
+        run: |
+          set +e
+          docker run --rm -e GCP_PROJECT_ID=x -e GCS_RAW_BUCKET=x pipeline:ci
+          code=$?
+          echo "code de sortie : $code"
+          test "$code" -eq 2
+
+      - name: Outils présents dans l'image
+        run: docker run --rm --entrypoint sh pipeline:ci -c "dbt --version && python -c 'import ingestion, quality.reconcile'"

@@ -42,3 +42,33 @@ module "ci_dbt" {
   dataset_ids       = module.bigquery.dataset_ids
   github_repository = var.github_repository
 }
+
+module "artifact_registry" {
+  source      = "../../modules/artifact_registry"
+  project_id  = var.project_id
+  region      = var.region
+  environment = "dev"
+}
+
+module "run_jobs" {
+  source           = "../../modules/run_jobs"
+  project_id       = var.project_id
+  region           = var.region
+  environment      = "dev"
+  raw_bucket       = module.storage.raw_bucket
+  bq_location      = var.bq_location
+  dbt_target       = "dev"
+  service_accounts = module.iam.service_accounts
+}
+
+module "scheduler" {
+  source     = "../../modules/scheduler"
+  project_id = var.project_id
+  region     = var.region
+  paused     = true
+
+  schedules = {
+    ingestion = { job_name = module.run_jobs.job_names["ingestion"], cron = "0 3 5 * *" }
+    transform = { job_name = module.run_jobs.job_names["transform"], cron = "0 5 5 * *" }
+  }
+}

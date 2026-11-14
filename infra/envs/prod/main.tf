@@ -33,3 +33,33 @@ module "budget" {
   amount          = var.budget_amount
   currency        = var.budget_currency
 }
+
+module "artifact_registry" {
+  source      = "../../modules/artifact_registry"
+  project_id  = var.project_id
+  region      = var.region
+  environment = "prod"
+}
+
+module "run_jobs" {
+  source           = "../../modules/run_jobs"
+  project_id       = var.project_id
+  region           = var.region
+  environment      = "prod"
+  raw_bucket       = module.storage.raw_bucket
+  bq_location      = var.bq_location
+  dbt_target       = "prod"
+  service_accounts = module.iam.service_accounts
+}
+
+module "scheduler" {
+  source     = "../../modules/scheduler"
+  project_id = var.project_id
+  region     = var.region
+  paused     = false
+
+  schedules = {
+    ingestion = { job_name = module.run_jobs.job_names["ingestion"], cron = "0 3 5 * *" }
+    transform = { job_name = module.run_jobs.job_names["transform"], cron = "0 5 5 * *" }
+  }
+}

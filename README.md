@@ -55,7 +55,7 @@ qu'un prix dérape sur un marché.
 | 4. Ingestion | Job Python : prix PAM, pluie CHIRPS, Banque mondiale, change BCE ; empreinte, Parquet, journal | Terminée |
 | 5. dbt silver et gold | 5A staging · 5B référentiels · 5C faits, dimensions, contrat | Terminée |
 | 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | Terminée |
-| 7. Déploiement continu | Image, Artifact Registry, Cloud Run Jobs, Scheduler, dev puis prod | À faire |
+| 7. Déploiement continu | Image, Artifact Registry, Cloud Run Jobs, Scheduler, dev puis prod | En cours |
 | 8. Tableau de bord et documentation | Looker Studio, schémas, décisions | À faire |
 
 ## 3. Périmètre : ce que les données contiennent vraiment
@@ -275,29 +275,29 @@ l'état est stocké dans un bucket dédié, un préfixe par environnement.
 
 ## 9. CI/CD et déploiement
 
-**Sur chaque pull request** (`.github/workflows/ci.yml` : étape 3, dbt depuis l'étape 5 ; l'image Docker
-s'ajoutera à l'étape 7).
+**Sur chaque pull request** (`.github/workflows/ci.yml` : étape 3, dbt depuis l'étape 5, image depuis l'étape 7).
 
 1. Lint : `ruff`, `sqlfluff`, `terraform fmt` et `terraform validate`.
 2. Tests `pytest` : client HDX, profilage, conversion d'unités, empreinte, règle d'alerte.
 3. `terraform plan` sur dev, publié en commentaire de la pull request.
 4. `dbt build` sur le dataset `ci` (Slim CI : modèles modifiés et leurs descendants, parents inchangés lus
    dans dev avec `--defer`). Identité `sa-dbt-ci`, qui ne peut écrire que dans `ci` (ADR-008).
-5. Build de l'image Docker, analyse de vulnérabilités, recherche de secrets.
+5. Construction de l'image Docker et démarrage à vide, recherche de secrets.
 
-**Après fusion sur `main`.**
+**Après fusion sur `main`** (`.github/workflows/cd.yml`, ADR-010).
 
-1. `terraform apply` sur dev.
-2. Image étiquetée avec le numéro de commit, poussée dans Artifact Registry.
-3. Mise à jour des Cloud Run Jobs vers cette image.
-4. Exécution complète en dev comme test de fumée.
-5. Validation manuelle, puis les mêmes étapes sur prod.
+1. dev : `terraform apply`, image étiquetée avec le numéro de commit et poussée dans Artifact Registry,
+   mise à jour des Cloud Run Jobs `obs-ingestion` et `obs-transform`.
+2. Test de fumée : les deux jobs sont exécutés jusqu'au bout en dev (ingestion, dbt avec ses contrôles,
+   rapprochement Python). Le moindre échec arrête le déploiement.
+3. Validation manuelle (environnement GitHub `prod`), puis `terraform apply` sur prod, copie de **la même image**
+   et exécution complète.
 
-**Retour arrière.** Redéployer l'image du commit précédent. Les données se reconstruisent depuis `bronze`,
-qui n'est jamais modifié par dbt.
+**Retour arrière.** Lancer `cd` à la main avec `image_sha` = un commit déjà déployé : son image est remise en
+place sans reconstruction. Les données se reconstruisent depuis `bronze`, qui n'est jamais modifié par dbt.
 
-**Exécution mensuelle.** Chaque exécution traite un mois identifié et remplace ce qu'elle a produit :
-relancer un mois ou rattraper l'historique ne crée jamais de doublon.
+**Exécution mensuelle.** Cloud Scheduler lance l'ingestion le 5 du mois à 3 h et la transformation à 5 h
+(heure de Paris), en prod. Chaque exécution est idempotente : relancer un job ne crée jamais de doublon.
 
 ## 10. Démarrer
 
