@@ -53,7 +53,7 @@ qu'un prix dérape sur un marché.
 | 2. Socle Terraform | Projet GCP, buckets, datasets, comptes de service, budget, état distant | Terminée |
 | 3. CI de base | ruff, pytest, gitleaks, `terraform plan` en commentaire, Workload Identity Federation | Terminée |
 | 4. Ingestion | Job Python : prix PAM, pluie CHIRPS, Banque mondiale, change BCE ; empreinte, Parquet, journal | Terminée |
-| 5. dbt silver et gold | 5A staging · 5B référentiels · 5C faits, dimensions, contrat | En cours (5A et 5B terminées, 5C) |
+| 5. dbt silver et gold | 5A staging · 5B référentiels · 5C faits, dimensions, contrat | Terminée |
 | 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | À faire |
 | 7. Déploiement continu | Image, Artifact Registry, Cloud Run Jobs, Scheduler, dev puis prod | À faire |
 | 8. Tableau de bord et documentation | Looker Studio, schémas, décisions | À faire |
@@ -267,13 +267,14 @@ l'état est stocké dans un bucket dédié, un préfixe par environnement.
 
 ## 9. CI/CD et déploiement
 
-**Sur chaque pull request** (`.github/workflows/ci.yml`, en place depuis l'étape 3 ; dbt et l'image Docker
-s'ajouteront aux étapes 5 et 7).
+**Sur chaque pull request** (`.github/workflows/ci.yml` : étape 3, dbt depuis l'étape 5 ; l'image Docker
+s'ajoutera à l'étape 7).
 
 1. Lint : `ruff`, `sqlfluff`, `terraform fmt` et `terraform validate`.
 2. Tests `pytest` : client HDX, profilage, conversion d'unités, empreinte, règle d'alerte.
 3. `terraform plan` sur dev, publié en commentaire de la pull request.
-4. `dbt build` sur le dataset `ci` (Slim CI : modèles modifiés et leurs descendants).
+4. `dbt build` sur le dataset `ci` (Slim CI : modèles modifiés et leurs descendants, parents inchangés lus
+   dans dev avec `--defer`). Identité `sa-dbt-ci`, qui ne peut écrire que dans `ci` (ADR-008).
 5. Build de l'image Docker, analyse de vulnérabilités, recherche de secrets.
 
 **Après fusion sur `main`.**

@@ -28,3 +28,8 @@ variable "budget_currency" {
   description = "Devise du compte de facturation (TF_VAR_budget_currency)"
   default     = "EUR"
 }
+
+variable "github_repository" {
+  type    = string
+  default = "gelvicnsk/observatoire-prix-cemac"
+}
