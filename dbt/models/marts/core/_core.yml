@@ -1,0 +1,134 @@
+version: 2
+
+models:
+  - name: dim_country
+    description: Les 6 pays de la CEMAC et la profondeur réelle de leurs prix (actif, historique, absent).
+    columns:
+      - name: country_iso3
+        data_tests: [unique, not_null]
+      - name: data_status
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['actif', 'historique', 'absent']}
+
+  - name: dim_month
+    columns:
+      - name: month
+        data_tests: [unique, not_null]
+
+  - name: dim_market
+    description: Marchés du PAM avec leur district COD-AB et leur code pluie CHIRPS (ADR-007).
+    columns:
+      - name: market_key
+        data_tests: [unique, not_null]
+      - name: country_iso3
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_country'), field: country_iso3}
+
+  - name: dim_commodity
+    description: Produits normalisés (nom français) ; source_names liste les noms du PAM regroupés.
+    columns:
+      - name: commodity_key
+        data_tests: [unique, not_null]
+      - name: commodity_name_fr
+        data_tests: [unique, not_null]
+
+  - name: fct_price_monthly
+    description: >
+      Prix mensuel moyen par marché, produit, type de prix et unité de base, en XAF par kg ou par litre,
+      converti en EUR (parité fixe) et en USD (taux BCE du mois). is_suspect signale qu'au moins un relevé du
+      mois est hors d'un facteur 10 de la médiane du produit dans le pays.
+    config:
+      contract: {enforced: true}
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [market_key, commodity_key, price_type, base_unit, price_month]
+    columns:
+      - name: price_monthly_id
+        data_type: string
+        constraints: [{type: not_null}]
+        data_tests: [unique]
+      - name: price_month
+        data_type: date
+        constraints: [{type: not_null}]
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_month'), field: month}
+      - name: country_iso3
+        data_type: string
+        constraints: [{type: not_null}]
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_country'), field: country_iso3}
+      - name: market_key
+        data_type: string
+        constraints: [{type: not_null}]
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_market'), field: market_key}
+      - name: commodity_key
+        data_type: string
+        constraints: [{type: not_null}]
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_commodity'), field: commodity_key}
+      - name: price_type
+        data_type: string
+        constraints: [{type: not_null}]
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['Retail', 'Wholesale']}
+      - name: base_unit
+        data_type: string
+        constraints: [{type: not_null}]
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['kg', 'l']}
+      - name: n_observations
+        data_type: int64
+        constraints: [{type: not_null}]
+      - name: n_suspect_observations
+        data_type: int64
+      - name: is_suspect
+        data_type: boolean
+      - name: units_raw
+        data_type: string
+        description: Unités d'origine du PAM présentes dans le mois (ex. « 50 KG, KG »).
+      - name: has_aggregate
+        data_type: boolean
+        description: Au moins un relevé du mois est une agrégation du PAM (priceflag aggregate).
+      - name: price_xaf_per_unit
+        data_type: numeric(18, 4)
+        constraints: [{type: not_null}]
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments: {expression: "> 0"}
+      - name: price_eur_per_unit
+        data_type: numeric(18, 4)
+      - name: price_usd_per_unit
+        data_type: numeric(18, 4)
+        description: Null pour les mois sans taux BCE publié (le plus récent, en général).
+      - name: xaf_per_usd
+        data_type: numeric(18, 6)
+      - name: source_ingested_at
+        data_type: timestamp
+
+  - name: fct_country_indicator_yearly
+    description: Inflation et population par pays et par année (Banque mondiale). Grain distinct des prix (ADR-003).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [country_iso3, indicator_code, year]}
+    columns:
+      - name: indicator_yearly_id
+        data_tests: [unique, not_null]
+      - name: country_iso3
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_country'), field: country_iso3}
+      - name: indicator_code
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: ['inflation_pct', 'population']}

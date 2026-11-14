@@ -1,7 +1,8 @@
 version: 2
 
-# Premier passage : les contrôles dont on ne connaît pas encore le résultat sur les vraies données
-# sont en « warn » ; ils passeront en « error » une fois les données observées (étape 5C).
+# Les contrôles observés sur les vraies données à l'étape 5A sont passés en « error » à l'étape 5C.
+# Restent en « warn » les correspondances vers les référentiels : un nouveau produit ou une nouvelle unité
+# du PAM ne doit pas bloquer le run, mais être signalé (make seeds-reference).
 
 models:
   - name: stg_wfp__prices
@@ -11,8 +12,7 @@ models:
         description: Clé technique (pays, marché, produit, unité, type de prix, indicateur, date).
         data_tests:
           - not_null
-          - unique:
-              config: {severity: warn}
+          - unique
       - name: price_date
         data_tests: [not_null]
       - name: country_iso3
@@ -38,18 +38,15 @@ models:
         data_tests:
           - accepted_values:
               arguments: {values: ['Retail', 'Wholesale']}
-              config: {severity: warn}
       - name: currency_code
         data_tests:
           - accepted_values:
               arguments: {values: ['XAF']}
-              config: {severity: warn}
       - name: price_local
         data_tests:
           - not_null
           - dbt_utils.expression_is_true:
               arguments: {expression: "> 0"}
-              config: {severity: warn}
 
   - name: stg_chirps__rainfall_dekads
     description: Pluie CHIRPS par unité administrative et par décade (dernière version par pays).
@@ -72,7 +69,6 @@ models:
         data_tests:
           - dbt_utils.expression_is_true:
               arguments: {expression: ">= 0"}
-              config: {severity: warn}
 
   - name: stg_world_bank__indicators
     data_tests:
@@ -95,4 +91,3 @@ models:
           - not_null
           - dbt_utils.expression_is_true:
               arguments: {expression: "between 0.5 and 2"}
-              config: {severity: warn}
