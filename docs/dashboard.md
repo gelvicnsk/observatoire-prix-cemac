@@ -55,3 +55,13 @@ agrégats calculés à partir de données publiques.
 Le compte `sa-dashboard` (lecture de `gold`) est prêt pour une connexion par compte de service. Pour l'utiliser
 à la place des identifiants du propriétaire, il faut autoriser l'agent de service de Looker Studio à agir pour ce compte
 (rôle `roles/iam.serviceAccountTokenCreator`). Ce n'est pas fait dans cette version.
+
+## 4. Lire la pluie
+
+`rainfall_pct_of_normal` est vide dans deux cas, qu'il ne faut pas confondre :
+
+- **pas de pluie rattachée** (`rainfall_mm` vide aussi) : Gabon, et 4 marchés de Centrafrique dans des préfectures
+  créées en 2020 (ADR-007) ;
+- **saison sèche** (`rainfall_mm` renseigné) : la normale du mois est inférieure à 1 mm, comme de novembre à avril
+  au Tchad. Un pourcentage de la normale n'y a pas de sens. Le cumul sur 3 mois (`rainfall_3m_pct_of_normal`)
+  reste en général disponible, et c'est lui qu'il faut afficher dans la page « Pluie et prix ».
