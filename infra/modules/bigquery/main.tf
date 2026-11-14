@@ -1,11 +1,12 @@
 # Un dataset par couche. Les noms sont identiques en dev et en prod : l'isolation vient du projet.
 locals {
   datasets = {
-    bronze = "Copie brute des sources, chargée par le job d'ingestion"
-    silver = "Données normalisées (staging et intermediate dbt)"
-    gold   = "Faits, dimensions et marts prêts à consommer"
-    meta   = "Journal de chargement, fichiers traités, lignes mises de côté, contrôles"
-    ci     = "Modèles dbt construits par la CI ; tables supprimées au bout de 7 jours"
+    bronze     = "Copie brute des sources, chargée par le job d'ingestion"
+    silver     = "Données normalisées (staging et intermediate dbt)"
+    gold       = "Faits, dimensions et marts prêts à consommer"
+    meta       = "Journal de chargement, fichiers traités, lignes mises de côté, contrôles"
+    ci         = "Modèles dbt construits par la CI ; tables supprimées au bout de 7 jours"
+    elementary = "Historique des contrôles dbt et métriques de surveillance (Elementary)"
   }
   seven_days_ms = 7 * 24 * 60 * 60 * 1000
 }

@@ -56,7 +56,7 @@ qu'un prix dérape sur un marché.
 | 5. dbt silver et gold | 5A staging · 5B référentiels · 5C faits, dimensions, contrat | Terminée |
 | 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | Terminée |
 | 7. Déploiement continu | Image, Artifact Registry, Cloud Run Jobs, Scheduler, dev puis prod | Terminée |
-| 8. Tableau de bord et documentation | Looker Studio, schémas, décisions | À faire |
+| 8. Tableau de bord et documentation | Elementary, Looker Studio, schémas, décisions | En cours (Elementary) |
 
 ## 3. Périmètre : ce que les données contiennent vraiment
 

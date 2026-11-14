@@ -14,6 +14,11 @@ variable "raw_bucket" {
   type = string
 }
 
+variable "reports_bucket" {
+  type        = string
+  description = "Bucket où le job transform dépose le rapport Elementary"
+}
+
 variable "bq_location" {
   type = string
 }

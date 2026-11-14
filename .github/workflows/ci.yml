@@ -215,4 +215,6 @@ jobs:
           test "$code" -eq 2
 
       - name: Outils présents dans l'image
-        run: docker run --rm --entrypoint sh pipeline:ci -c "dbt --version && python -c 'import ingestion, quality.reconcile'"
+        run: |
+          docker run --rm --entrypoint sh pipeline:ci -c \
+            "dbt --version && edr --version && python -c 'import ingestion, quality.reconcile, pipeline.publish_report'"

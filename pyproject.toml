@@ -21,6 +21,10 @@ dev = [
 geo = [
     "shapely>=2.0",
 ]
+# Rapport Elementary (edr), installé dans l'image du pipeline (étape 8)
+observability = [
+    "elementary-data[bigquery]==0.26.1",
+]
 dbt = [
     "dbt-core>=1.12,<1.13",
     "dbt-bigquery>=1.12,<1.13",
@@ -41,7 +45,7 @@ target-version = "py311"
 select = ["E", "F", "I", "B", "UP", "SIM"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["ingestion", "scripts", "quality"]
+known-first-party = ["ingestion", "scripts", "quality", "pipeline"]
 
 [build-system]
 requires = ["setuptools>=68"]

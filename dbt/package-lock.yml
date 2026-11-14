@@ -1,5 +1,8 @@
 packages:
-  - git: https://github.com/dbt-labs/dbt-utils.git
-    name: dbt_utils
-    revision: ef562bac8583a3dd041437d1a0ed926d356da4fd
-sha1_hash: 17b9cdf0da7658dc9394d2b921a241ab3347a0aa
+  - name: dbt_utils
+    package: dbt-labs/dbt_utils
+    version: 1.3.3
+  - name: elementary
+    package: elementary-data/elementary
+    version: 0.26.1
+sha1_hash: ad70c9a4ac43d8f0334b77b238586b623b287208

@@ -45,6 +45,15 @@ models:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns: [market_key, commodity_key, price_type, base_unit, price_month]
+      # Elementary : volume total comparé aux exécutions précédentes, et colonnes ajoutées, retirées ou retypées
+      - elementary.volume_anomalies:
+          config:
+            severity: warn
+            enabled: "{{ target.name != 'ci' }}"
+      - elementary.schema_changes:
+          config:
+            severity: warn
+            enabled: "{{ target.name != 'ci' }}"
     columns:
       - name: price_monthly_id
         data_type: string

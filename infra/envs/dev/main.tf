@@ -19,10 +19,11 @@ module "bigquery" {
 }
 
 module "iam" {
-  source      = "../../modules/iam"
-  project_id  = var.project_id
-  raw_bucket  = module.storage.raw_bucket
-  dataset_ids = module.bigquery.dataset_ids
+  source         = "../../modules/iam"
+  project_id     = var.project_id
+  raw_bucket     = module.storage.raw_bucket
+  reports_bucket = module.storage.reports_bucket
+  dataset_ids    = module.bigquery.dataset_ids
 }
 
 module "budget" {
@@ -56,6 +57,7 @@ module "run_jobs" {
   region           = var.region
   environment      = "dev"
   raw_bucket       = module.storage.raw_bucket
+  reports_bucket   = module.storage.reports_bucket
   bq_location      = var.bq_location
   dbt_target       = "dev"
   service_accounts = module.iam.service_accounts

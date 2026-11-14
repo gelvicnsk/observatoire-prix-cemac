@@ -36,3 +36,24 @@ observatoire_cemac:
       priority: batch
       job_execution_timeout_seconds: 600
       maximum_bytes_billed: 5000000000
+
+# Profil lu par le rapport Elementary (edr report) : même projet, dataset elementary
+elementary:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: elementary
+      location: "{{ env_var('BQ_LOCATION', 'EU') }}"
+      threads: 4
+      job_execution_timeout_seconds: 300
+    prod:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: elementary
+      location: "{{ env_var('BQ_LOCATION', 'EU') }}"
+      threads: 4
+      job_execution_timeout_seconds: 600

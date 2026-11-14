@@ -20,16 +20,19 @@ WORKDIR /app
 # Dépendances d'abord : la couche est réutilisée tant que pyproject.toml ne change pas
 COPY pyproject.toml ./
 COPY ingestion/src ./ingestion/src
-RUN pip install --no-cache-dir ".[dbt]"
+RUN pip install --no-cache-dir ".[dbt,observability]"
 
 COPY dbt ./dbt
 RUN cd dbt && dbt deps
 
 COPY quality ./quality
 COPY pipeline ./pipeline
+# edr (rapport Elementary) installe ses propres paquets dbt au premier lancement, dans son dossier :
+# l'utilisateur du job doit pouvoir y écrire
 RUN chmod +x pipeline/entrypoint.sh \
     && useradd --create-home --uid 10001 pipeline \
-    && chown -R pipeline /app
+    && chown -R pipeline /app \
+    && chown -R pipeline "$(python -c 'import elementary, os; print(os.path.dirname(elementary.__file__))')"
 USER pipeline
 
 ENTRYPOINT ["/app/pipeline/entrypoint.sh"]

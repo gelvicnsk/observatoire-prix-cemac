@@ -1,4 +1,8 @@
 packages:
-  # Version figée par son tag Git (téléchargée depuis GitHub)
-  - git: "https://github.com/dbt-labs/dbt-utils.git"
-    revision: "1.3.3"
+  # Versions figées, prises sur le dbt Hub. Elementary dépend lui-même de dbt_utils par le Hub : nos deux
+  # paquets doivent venir de la même source, sinon dbt refuse de les réconcilier.
+  - package: dbt-labs/dbt_utils
+    version: 1.3.3
+  # Elementary : historique des contrôles, détection d'anomalies, rapport (étape 8)
+  - package: elementary-data/elementary
+    version: 0.26.1

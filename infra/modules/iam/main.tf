@@ -2,7 +2,7 @@
 #
 #   compte      lit                      écrit
 #   ingestion   sources publiques        bucket raw, bronze, meta
-#   dbt         raw, bronze              silver, gold, meta
+#   dbt         raw, bronze              silver, gold, meta, elementary, bucket reports
 #   dashboard   gold                     rien
 
 resource "google_service_account" "ingestion" {
@@ -37,6 +37,7 @@ locals {
     dbt_silver       = { dataset = "silver", role = "roles/bigquery.dataEditor", member = local.sa.dbt }
     dbt_gold         = { dataset = "gold", role = "roles/bigquery.dataEditor", member = local.sa.dbt }
     dbt_meta         = { dataset = "meta", role = "roles/bigquery.dataEditor", member = local.sa.dbt }
+    dbt_elementary   = { dataset = "elementary", role = "roles/bigquery.dataEditor", member = local.sa.dbt }
     dashboard_gold   = { dataset = "gold", role = "roles/bigquery.dataViewer", member = local.sa.dashboard }
   }
 }
@@ -67,5 +68,12 @@ resource "google_storage_bucket_iam_member" "raw_writer" {
 resource "google_storage_bucket_iam_member" "raw_reader" {
   bucket = var.raw_bucket
   role   = "roles/storage.objectViewer"
+  member = local.sa.dbt
+}
+
+# Bucket des rapports : dbt y dépose le rapport Elementary
+resource "google_storage_bucket_iam_member" "reports_writer" {
+  bucket = var.reports_bucket
+  role   = "roles/storage.objectAdmin"
   member = local.sa.dbt
 }
