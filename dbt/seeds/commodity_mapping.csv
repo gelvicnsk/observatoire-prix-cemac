@@ -29,7 +29,7 @@ Fish (salted),"meat, fish and eggs",Poisson (salé),"Viande, poisson et œufs",t
 "Fish (sardine, canned)","meat, fish and eggs",Sardines (en conserve),"Viande, poisson et œufs",true,relu
 Fish (smoked),"meat, fish and eggs",Poisson (fumé),"Viande, poisson et œufs",true,auto
 "Fish (tilapia, salted, dried)","meat, fish and eggs","Tilapia (salé, séché)","Viande, poisson et œufs",true,relu
-Fuel (gas),non-food,Carburant (gaz),Non alimentaire,false,a_verifier
+Fuel (gas),non-food,Gaz domestique (butane),Non alimentaire,false,relu
 Fuel (petrol-gasoline),non-food,Carburant (essence),Non alimentaire,false,auto
 Garlic,vegetables and fruits,Ail,Fruits et légumes,true,auto
 Groundnuts,pulses and nuts,Arachide,Légumineuses et oléagineux,true,auto

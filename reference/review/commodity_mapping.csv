@@ -13,7 +13,7 @@ Fish (catfish),Poisson-chat (silure),,,
 Fish (salted),Poisson (salé),,,
 "Fish (sardine, canned)",Sardines (en conserve),,,
 "Fish (tilapia, salted, dried)","Tilapia (salé, séché)",,,
-Fuel (gas),Carburant (gaz),,a_verifier,Butane ou essence : à trancher d'après l'unité
+Fuel (gas),Gaz domestique (butane),false,,Vendu au kg en Centrafrique (35 relevés) : gaz de cuisine
 Groundnuts (paste),Pâte d'arachide,,,
 Laundry detergent,Lessive,,,
 Laundry soap,Savon de lessive,,,

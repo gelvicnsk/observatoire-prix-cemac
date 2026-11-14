@@ -48,3 +48,11 @@ On peut donc régénérer un seed puis rejouer la relecture : chaque décision m
   ce n'est pas garanti.
 - Une solution complète consisterait à calculer la pluie directement depuis la grille CHIRPS sur les contours
   récents. C'est hors du périmètre actuel.
+
+## Indicateur de pluie
+
+Les écarts à la normale publiés par le PAM (`rfq`, `r1q`, `r3q`) ne suivent pas une formule simple retrouvable :
+100 × pluie / normale ne colle que pour 22 % des lignes, et la variante (pluie + 1) / (normale + 1) pour 28 %.
+On les garde tels quels (`published_*_anomaly_pct`), mais l'observatoire utilise son propre indicateur,
+documenté : `rainfall_pct_of_normal` = 100 × pluie / normale 1989-2018. Il vaut null quand la normale est
+inférieure à 1 mm, en saison sèche, où un rapport n'a pas de sens.

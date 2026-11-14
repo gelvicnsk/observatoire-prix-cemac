@@ -7,8 +7,11 @@
 --
 -- Au Tchad, deux codes (TCD0703 et TCD2201) sont portés chacun par deux zones distinctes du PAM, sur toute
 -- la période (identifiants, nombres de pixels et valeurs différents). On les fusionne : moyenne pondérée par
--- le nombre de pixels, c'est-à-dire la pluie sur la réunion des deux zones. Les écarts à la normale sont
--- recalculés pour ces lignes fusionnées ; les autres gardent la valeur publiée.
+-- le nombre de pixels, c'est-à-dire la pluie sur la réunion des deux zones.
+--
+-- Écarts à la normale : la formule exacte du PAM (rfq, r1q, r3q) n'est pas 100 × pluie / normale (vérifié :
+-- 22 % des lignes seulement). On garde donc la valeur publiée (moyenne pondérée pour les lignes fusionnées)
+-- et on calcule notre propre indicateur, documenté, rainfall_pct_of_normal, utilisé dans gold.
 with source as (
     select *, coalesce(n_pixels, 1) as weight
     from {{ ref('stg_chirps__rainfall_dekads') }}
@@ -29,9 +32,9 @@ merged as (
         {{ weighted_mean('rainfall_1m_lta_mm', 'weight') }}      as rainfall_1m_lta_mm,
         {{ weighted_mean('rainfall_3m_mm', 'weight') }}          as rainfall_3m_mm,
         {{ weighted_mean('rainfall_3m_lta_mm', 'weight') }}      as rainfall_3m_lta_mm,
-        any_value(rainfall_anomaly_pct)                          as published_anomaly_pct,
-        any_value(rainfall_1m_anomaly_pct)                       as published_1m_anomaly_pct,
-        any_value(rainfall_3m_anomaly_pct)                       as published_3m_anomaly_pct,
+        {{ weighted_mean('rainfall_anomaly_pct', 'weight') }}    as published_anomaly_pct,
+        {{ weighted_mean('rainfall_1m_anomaly_pct', 'weight') }} as published_1m_anomaly_pct,
+        {{ weighted_mean('rainfall_3m_anomaly_pct', 'weight') }} as published_3m_anomaly_pct,
         any_value(data_version)                                  as data_version,
         max(ingested_at)                                         as ingested_at
     from source
@@ -52,14 +55,14 @@ select
     rainfall_1m_lta_mm,
     rainfall_3m_mm,
     rainfall_3m_lta_mm,
-    if(n_source_areas = 1, published_anomaly_pct,
-       100 * safe_divide(rainfall_mm, rainfall_lta_mm))                  as rainfall_anomaly_pct,
-    if(n_source_areas = 1, published_1m_anomaly_pct,
-       100 * safe_divide(rainfall_1m_mm, rainfall_1m_lta_mm))            as rainfall_1m_anomaly_pct,
-    if(n_source_areas = 1, published_3m_anomaly_pct,
-       100 * safe_divide(rainfall_3m_mm, rainfall_3m_lta_mm))            as rainfall_3m_anomaly_pct,
-    -- même calcul sur toutes les lignes : sert à vérifier qu'on reproduit bien la définition du PAM
-    100 * safe_divide(rainfall_mm, rainfall_lta_mm)                      as recomputed_anomaly_pct,
+    published_anomaly_pct,
+    published_1m_anomaly_pct,
+    published_3m_anomaly_pct,
+    -- notre indicateur : pluie en % de la normale 1989-2018 (null si la normale est inférieure à 1 mm,
+    -- où le rapport n'a pas de sens : saison sèche)
+    if(rainfall_lta_mm >= 1, 100 * rainfall_mm / rainfall_lta_mm, null)             as rainfall_pct_of_normal,
+    if(rainfall_1m_lta_mm >= 1, 100 * rainfall_1m_mm / rainfall_1m_lta_mm, null)    as rainfall_1m_pct_of_normal,
+    if(rainfall_3m_lta_mm >= 1, 100 * rainfall_3m_mm / rainfall_3m_lta_mm, null)    as rainfall_3m_pct_of_normal,
     data_version,
     ingested_at
 from merged

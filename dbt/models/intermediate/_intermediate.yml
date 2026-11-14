@@ -5,16 +5,11 @@ models:
     description: >
       Pluie CHIRPS dédoublonnée : une ligne par pays, code administratif et décade. Les deux codes du Tchad
       portés par deux zones sont fusionnés (moyenne pondérée par les pixels) ; n_source_areas vaut alors 2.
+      published_*_anomaly_pct : écarts publiés par le PAM (formule non documentée) ;
+      rainfall_*_pct_of_normal : pluie en % de la normale, calculée ici, null si la normale est inférieure à 1 mm.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments: {combination_of_columns: [country_iso3, pcode, dekad_start_date]}
-      # vérifie que l'écart publié par le PAM est bien 100 × pluie / normale (sinon le recalcul serait faux)
-      - dbt_utils.expression_is_true:
-          arguments:
-            expression: "abs(rainfall_anomaly_pct - recomputed_anomaly_pct) <= 1"
-          config:
-            severity: warn
-            where: "n_source_areas = 1 and rainfall_lta_mm >= 1"
     columns:
       - name: n_source_areas
         data_tests:
@@ -24,3 +19,11 @@ models:
         data_tests:
           - accepted_values:
               arguments: {values: [1, 2], quote: false}
+      - name: rainfall_pct_of_normal
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments: {expression: ">= 0"}
+      - name: rainfall_3m_pct_of_normal
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments: {expression: ">= 0"}
