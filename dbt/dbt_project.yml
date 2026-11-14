@@ -11,6 +11,17 @@ analysis-paths: ["analyses"]
 
 clean-targets: ["target", "dbt_packages"]
 
+# Paramètres des alertes (étape 6), fixés par la calibration du 14 novembre 2026 (ADR-009).
+# Une alerte exige un z-score ET une hausse sur 1 mois au-dessus des seuils.
+vars:
+  alert_reference_months: 24        # période de référence : les 24 mois qui précèdent le mois testé
+  alert_min_history_months: 12      # moins de 12 mois de référence : pas d'alerte
+  alert_z_threshold: 2.5            # alerte modérée : z-score >= 2,5 ...
+  alert_change_1m_pct: 25           # ... et hausse sur 1 mois >= 25 %
+  alert_z_strong: 3                 # alerte forte : z-score >= 3 ...
+  alert_change_1m_strong_pct: 40    # ... et hausse sur 1 mois >= 40 %
+  freshness_stale_months: 3         # pays actif sans nouveau relevé depuis 3 mois : signalé
+
 models:
   observatoire_cemac:
     +persist_docs:

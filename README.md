@@ -54,7 +54,7 @@ qu'un prix dérape sur un marché.
 | 3. CI de base | ruff, pytest, gitleaks, `terraform plan` en commentaire, Workload Identity Federation | Terminée |
 | 4. Ingestion | Job Python : prix PAM, pluie CHIRPS, Banque mondiale, change BCE ; empreinte, Parquet, journal | Terminée |
 | 5. dbt silver et gold | 5A staging · 5B référentiels · 5C faits, dimensions, contrat | Terminée |
-| 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | À faire |
+| 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | Terminée |
 | 7. Déploiement continu | Image, Artifact Registry, Cloud Run Jobs, Scheduler, dev puis prod | À faire |
 | 8. Tableau de bord et documentation | Looker Studio, schémas, décisions | À faire |
 
@@ -230,9 +230,17 @@ Chaque règle est une table de correspondance versionnée (seed dbt), jamais une
 
 ### Règle d'alerte
 
-Pour un marché et un produit, alerte quand la variation sur 1 mois dépasse un seuil, ou quand le z-score par
-rapport aux 24 mois précédents dépasse 2. Le mois testé est exclu de la période de référence, et une série de
-moins de 12 mois ne déclenche pas d'alerte. Les seuils sont des paramètres, fixés après observation des données.
+Pour un marché, un produit et un type de prix, alerte quand le prix du mois est **à la fois** anormal par
+rapport aux 24 mois précédents (z-score) **et** en forte hausse sur 1 mois :
+
+| Niveau | z-score | Hausse sur 1 mois | Alertes par mois (36 derniers mois) |
+|---|---|---|---|
+| modérée | ≥ 2,5 | ≥ 25 % | Tchad 19,5 · Cameroun 6,5 · Centrafrique 2,8 · Congo 0,4 |
+| forte | ≥ 3 | ≥ 40 % | Tchad 13,3 · Cameroun 3,4 · Centrafrique 1,7 · Congo 0,2 |
+
+Le mois testé est exclu de la période de référence, les relevés suspects sont retirés, et une série de moins
+de 12 mois de référence ne déclenche pas d'alerte. Les seuils viennent de la calibration sur les données
+(ADR-009) : avec la règle « l'un ou l'autre » initialement prévue, le Tchad aurait reçu jusqu'à 176 alertes par mois.
 
 ## 8. Infrastructure as Code et sécurité
 
