@@ -14,3 +14,11 @@ output "dbt_ci_service_account" {
   description = "À copier dans la variable GitHub DBT_CI_SA"
   value       = module.ci_dbt.service_account
 }
+
+output "image_repository" {
+  value = module.artifact_registry.repository_url
+}
+
+output "run_jobs" {
+  value = module.run_jobs.job_names
+}

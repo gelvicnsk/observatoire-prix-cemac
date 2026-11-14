@@ -1,1 +1,3 @@
-# Sorties du module : Déclenchement mensuel des jobs
+output "service_account" {
+  value = google_service_account.scheduler.email
+}

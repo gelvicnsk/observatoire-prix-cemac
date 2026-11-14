@@ -1,10 +1,155 @@
-# CD sur main : terraform apply dev, image dans Artifact Registry, mise à jour des Cloud Run Jobs,
-# run de fumée en dev, puis prod après validation manuelle. Activé à l'étape 7.
+# CD (étape 7) : après chaque fusion sur main.
+#
+#   dev   terraform apply -> image construite et poussée (étiquette = commit) -> jobs mis à jour
+#         -> test de fumée : obs-ingestion puis obs-transform, attendus jusqu'au bout
+#   prod  après validation manuelle (environnement GitHub « prod ») : terraform apply -> copie de la
+#         MÊME image depuis dev -> jobs mis à jour -> exécution complète
+#
+# Accès Google Cloud par le pool github-apply, réservé à la branche main, sans aucune clé (ADR-004).
+# Retour arrière : lancer ce workflow à la main avec image_sha = un commit déjà déployé. L'image de ce
+# commit (Artifact Registry garde les 10 dernières) est remise en place sans rien reconstruire.
 name: cd
+
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
   workflow_dispatch:
+    inputs:
+      image_sha:
+        description: "Retour arrière : commit dont l'image doit être redéployée (vide = construire main)"
+        required: false
+        default: ""
+
+# Un déploiement à la fois, jamais interrompu en cours de route
+concurrency:
+  group: cd
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  REGION: europe-west1
+  DEV_PROJECT: obs-cemac-dev-11259
+  PROD_PROJECT: obs-cemac-prod-11259
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+  TF_VAR_billing_account: ${{ secrets.GCP_BILLING_ACCOUNT }}
+  TF_VAR_budget_currency: ${{ vars.BUDGET_CURRENCY }}
+
 jobs:
-  placeholder:
+  dev:
+    name: Déploiement dev et test de fumée
     runs-on: ubuntu-latest
+    environment: dev
+    outputs:
+      image: ${{ steps.image.outputs.ref }}
+      sha: ${{ steps.image.outputs.sha }}
     steps:
-      - run: echo "Déploiement continu : étape 7"
+      - uses: actions/checkout@v7
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.17.2"
+          terraform_wrapper: false
+
+      - name: Authentification Google Cloud (sans clé, branche main)
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER_APPLY }}
+          service_account: ${{ vars.TF_APPLY_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v3
+
+      - name: Terraform apply dev
+        run: |
+          terraform -chdir=infra/envs/dev init -backend-config=backend.hcl
+          terraform -chdir=infra/envs/dev apply -lock-timeout=120s -auto-approve
+
+      - name: Construire et pousser l'image (ou reprendre une image existante)
+        id: image
+        env:
+          ROLLBACK_SHA: ${{ inputs.image_sha }}
+        run: |
+          sha="${ROLLBACK_SHA:-$GITHUB_SHA}"
+          ref="$REGION-docker.pkg.dev/$DEV_PROJECT/observatoire/pipeline:$sha"
+          if [ -n "$ROLLBACK_SHA" ]; then
+            echo "Retour arrière vers $sha : aucune construction"
+            gcloud artifacts docker images describe "$ref" --quiet > /dev/null
+          else
+            gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+            docker build --label "org.opencontainers.image.revision=$sha" -t "$ref" .
+            docker push "$ref"
+          fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Mettre à jour les jobs
+        run: |
+          for job in obs-ingestion obs-transform; do
+            gcloud run jobs update "$job" --image "${{ steps.image.outputs.ref }}" \
+              --region "$REGION" --project "$DEV_PROJECT" --quiet
+          done
+
+      - name: Test de fumée (ingestion puis transformation, jusqu'au bout)
+        run: |
+          for job in obs-ingestion obs-transform; do
+            echo "== $job"
+            gcloud run jobs execute "$job" --wait --region "$REGION" --project "$DEV_PROJECT"
+          done
+
+  prod:
+    name: Déploiement prod (après validation)
+    needs: dev
+    runs-on: ubuntu-latest
+    environment: prod        # validation manuelle exigée par l'environnement GitHub
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.17.2"
+          terraform_wrapper: false
+
+      - name: Authentification Google Cloud (sans clé, branche main)
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER_APPLY }}
+          service_account: ${{ vars.TF_APPLY_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v3
+
+      - name: Terraform apply prod
+        run: |
+          terraform -chdir=infra/envs/prod init -backend-config=backend.hcl
+          terraform -chdir=infra/envs/prod apply -lock-timeout=120s -auto-approve
+
+      # Pas de nouvelle construction : prod reçoit exactement l'image testée en dev
+      - name: Copier l'image validée en dev
+        id: image
+        run: |
+          source="${{ needs.dev.outputs.image }}"
+          target="$REGION-docker.pkg.dev/$PROD_PROJECT/observatoire/pipeline:${{ needs.dev.outputs.sha }}"
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          docker pull "$source"
+          docker tag "$source" "$target"
+          docker push "$target"
+          echo "ref=$target" >> "$GITHUB_OUTPUT"
+
+      - name: Mettre à jour les jobs
+        run: |
+          for job in obs-ingestion obs-transform; do
+            gcloud run jobs update "$job" --image "${{ steps.image.outputs.ref }}" \
+              --region "$REGION" --project "$PROD_PROJECT" --quiet
+          done
+
+      - name: Exécution complète en prod
+        run: |
+          for job in obs-ingestion obs-transform; do
+            echo "== $job"
+            gcloud run jobs execute "$job" --wait --region "$REGION" --project "$PROD_PROJECT"
+          done
