@@ -18,6 +18,9 @@ dev = [
     "ruff>=0.6",
     "sqlfluff>=3.1",
 ]
+geo = [
+    "shapely>=2.0",
+]
 dbt = [
     "dbt-core>=1.12,<1.13",
     "dbt-bigquery>=1.12,<1.13",

@@ -10,13 +10,13 @@ DBT := dbt
 ENV ?= dev
 MONTH ?= $(shell date -d "last month" +%Y-%m)
 
-.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run backfill dbt-deps dbt-build dbt-freshness dbt-docs
+.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run backfill seeds-reference seeds-markets dbt-deps dbt-build dbt-freshness dbt-docs
 
 help:
 	@grep -E '^[a-z-]+:' Makefile | cut -d: -f1
 
 install:            ## environnement Python local
-	python3 -m venv .venv && . .venv/bin/activate && pip install -e ".[dev,dbt]"
+	python3 -m venv .venv && . .venv/bin/activate && pip install -e ".[dev,dbt,geo]"
 
 lint:               ## ruff + sqlfluff + terraform fmt
 	ruff check . && ruff format --check .
@@ -66,6 +66,12 @@ run:                ## ingestion + dbt pour un mois (MONTH=2026-10)
 
 backfill:           ## rejouer une période : make backfill FROM=2020-01 TO=2026-10
 	bash scripts/backfill.sh $(FROM) $(TO)
+
+seeds-reference:    ## étape 5B : propose les seeds unit_conversion et commodity_mapping (depuis BigQuery)
+	python -m scripts.build_reference_seeds --project $(GCP_PROJECT_ID)
+
+seeds-markets:      ## étape 5B : rattache les marchés aux districts COD-AB (seed market_district)
+	python -m scripts.map_markets_to_districts --project $(GCP_PROJECT_ID)
 
 dbt-deps:           ## étape 5 : paquets dbt (dbt_utils, version figée)
 	$(DBT) deps

@@ -23,9 +23,17 @@ models:
       - name: market_name
         data_tests: [not_null]
       - name: commodity_name
-        data_tests: [not_null]
+        data_tests:
+          - not_null
+          - relationships:   # un nouveau produit du PAM : relancer make seeds-reference
+              arguments: {to: ref('commodity_mapping'), field: commodity_raw}
+              config: {severity: warn}
       - name: unit_raw
-        data_tests: [not_null]
+        data_tests:
+          - not_null
+          - relationships:   # une nouvelle unité du PAM : relancer make seeds-reference
+              arguments: {to: ref('unit_conversion'), field: unit_raw}
+              config: {severity: warn}
       - name: price_type
         data_tests:
           - accepted_values:
@@ -46,9 +54,10 @@ models:
   - name: stg_chirps__rainfall_dekads
     description: Pluie CHIRPS par unité administrative et par décade (dernière version par pays).
     data_tests:
+      # un code peut être porté par deux zones du PAM (2 cas au Tchad) : la clé de la source est l'identifiant
+      # de zone ; le dédoublonnage par code se fait dans int_chirps__rainfall_dekads
       - dbt_utils.unique_combination_of_columns:
-          arguments: {combination_of_columns: [country_iso3, pcode, dekad_start_date]}
-          config: {severity: warn}
+          arguments: {combination_of_columns: [country_iso3, wfp_admin_id, dekad_start_date]}
     columns:
       - name: pcode
         data_tests: [not_null]
@@ -58,7 +67,6 @@ models:
         data_tests:
           - accepted_values:
               arguments: {values: [1, 2], quote: false}
-              config: {severity: warn}
       - name: rainfall_mm
         data_tests:
           - dbt_utils.expression_is_true:

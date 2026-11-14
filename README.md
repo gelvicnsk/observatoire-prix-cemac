@@ -51,9 +51,9 @@ qu'un prix dérape sur un marché.
 |---|---|---|
 | 1. Inventaire des données | Client HDX, profilage des 6 pays, fiche `docs/data_profile.md` | Terminée |
 | 2. Socle Terraform | Projet GCP, buckets, datasets, comptes de service, budget, état distant | Terminée |
-| 3. CI de base | ruff, pytest, gitleaks, `terraform plan` en commentaire, Workload Identity Federation | En cours |
+| 3. CI de base | ruff, pytest, gitleaks, `terraform plan` en commentaire, Workload Identity Federation | Terminée |
 | 4. Ingestion | Job Python : prix PAM, pluie CHIRPS, Banque mondiale, change BCE ; empreinte, Parquet, journal | Terminée |
-| 5. dbt silver et gold | 5A staging · 5B référentiels · 5C faits, dimensions, contrat | En cours (5A) |
+| 5. dbt silver et gold | 5A staging · 5B référentiels · 5C faits, dimensions, contrat | En cours (5A terminée, 5B) |
 | 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | À faire |
 | 7. Déploiement continu | Image, Artifact Registry, Cloud Run Jobs, Scheduler, dev puis prod | À faire |
 | 8. Tableau de bord et documentation | Looker Studio, schémas, décisions | À faire |

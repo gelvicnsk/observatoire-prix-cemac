@@ -13,3 +13,91 @@ seeds:
     columns:
       - name: iso3
         data_tests: [unique, not_null]
+
+  - name: unit_conversion
+    description: >
+      Conversion des unités du PAM vers le kg ou le litre. Généré par scripts/build_reference_seeds.py,
+      puis relu à la main. Statuts : converti, sans_poids (prix gardé, hors comparaison au kg),
+      exclu (bétail sur pied), a_verifier.
+    config:
+      column_types:
+        unit_raw: string
+        quantity: float64
+        base_unit: string
+        factor_to_base: float64
+        status: string
+        note: string
+    columns:
+      - name: unit_raw
+        data_tests: [unique, not_null]
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['converti', 'sans_poids', 'exclu', 'a_verifier']}
+      - name: factor_to_base
+        data_tests:
+          - not_null:
+              config: {where: "status = 'converti'"}
+
+  - name: commodity_mapping
+    description: Nom français, groupe et inclusion dans l'indice pour chaque produit du PAM (scripts/build_reference_seeds.py).
+    config:
+      column_types:
+        commodity_raw: string
+        wfp_category: string
+        name_fr: string
+        group_fr: string
+        include_in_index: boolean
+        status: string
+    columns:
+      - name: commodity_raw
+        data_tests: [unique, not_null]
+      - name: name_fr
+        data_tests: [not_null]
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['auto', 'relu', 'a_verifier']}
+
+  - name: market_district
+    description: >
+      Région et district COD-AB de chaque marché du PAM, et code à utiliser pour la pluie CHIRPS
+      (scripts/map_markets_to_districts.py). La colonne method dit comment le rattachement a été fait.
+    config:
+      column_types:
+        country_iso3: string
+        market_name: string
+        wfp_market_id: string
+        latitude: float64
+        longitude: float64
+        adm1_pcode: string
+        adm1_name: string
+        adm2_pcode: string
+        adm2_name: string
+        method: string
+        distance_km: float64
+        wfp_admin2_name: string
+        name_matches: boolean
+        shared_coordinates: boolean
+        rainfall_pcode: string
+        rainfall_admin_level: int64
+        status: string
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [country_iso3, market_name]}
+    columns:
+      - name: method
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['point_in_polygon', 'nearest_polygon', 'nom_admin2', 'sans_coordonnees',
+                         'hors_contours', 'sans_contours', 'manuel']
+      - name: rainfall_pcode
+        description: Code présent dans int_chirps__rainfall_dekads (district, ou région à défaut).
+        data_tests:
+          - relationships:
+              arguments: {to: ref('int_chirps__rainfall_dekads'), field: pcode}
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['auto', 'relu', 'a_verifier']}
