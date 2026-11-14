@@ -33,3 +33,12 @@ module "budget" {
   amount          = var.budget_amount
   currency        = var.budget_currency
 }
+
+module "ci_dbt" {
+  source            = "../../modules/ci_dbt"
+  project_id        = var.project_id
+  project_number    = data.google_project.this.number
+  raw_bucket        = module.storage.raw_bucket
+  dataset_ids       = module.bigquery.dataset_ids
+  github_repository = var.github_repository
+}

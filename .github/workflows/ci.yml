@@ -2,7 +2,9 @@
 #   python    ruff (lint + format) et pytest
 #   secrets   recherche de secrets dans tout l'historique (gitleaks)
 #   terraform fmt, validate, puis plan sur dev publié en commentaire de la pull request
-# L'accès à Google Cloud passe par le pool github-plan (lecture seule), sans aucune clé.
+#   dbt       build des modèles modifiés (et de leurs descendants) dans le dataset ci (Slim CI)
+# L'accès à Google Cloud passe par le pool github-plan, sans aucune clé : tf-plan en lecture seule,
+# sa-dbt-ci qui ne peut écrire que dans le dataset ci.
 name: ci
 
 on:
@@ -11,6 +13,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      dbt_select:
+        description: "Sélection dbt (ex. +fct_price_monthly pour tout reconstruire en amont)"
+        default: "state:modified+"
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -118,3 +124,73 @@ jobs:
             } else {
               await github.rest.issues.createComment({ owner, repo, issue_number, body });
             }
+
+  dbt:
+    name: dbt (modèles modifiés, dataset ci)
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write        # jeton OIDC échangé contre l'identité sa-dbt-ci
+    env:
+      GCP_PROJECT_ID: obs-cemac-dev-11259
+      BQ_LOCATION: EU
+      DBT_PROFILES_DIR: ${{ github.workspace }}/dbt
+      DBT_SELECT: ${{ inputs.dbt_select || 'state:modified+' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # L'état de référence : le projet dbt tel qu'il est sur main
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: reference-main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Installer dbt
+        run: pip install -e ".[dbt]"
+
+      # Manifeste de main, rendu avec la cible dev, sans accès à BigQuery. Il sert deux fois :
+      #   - comparé à la PR, il dit quels modèles ont changé (state:modified) ;
+      #   - il pointe vers silver et gold, où lire les parents inchangés (--defer).
+      # Vérifié en local : la différence de dataset entre ci et dev ne fait rien paraître modifié.
+      - name: Manifeste de main
+        working-directory: reference-main/dbt
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/reference-main/dbt
+        run: |
+          dbt deps
+          dbt parse --target dev
+          mkdir -p "${{ github.workspace }}/state"
+          cp target/manifest.json "${{ github.workspace }}/state/"
+
+      - name: Authentification Google Cloud (sans clé)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER_PLAN }}
+          service_account: ${{ vars.DBT_CI_SA }}
+
+      # Modèles modifiés et leurs descendants construits dans ci ; leurs parents non modifiés
+      # sont lus dans dev (--defer), sans être reconstruits.
+      - name: Build
+        working-directory: dbt
+        run: |
+          dbt deps
+          dbt build --target ci --select "$DBT_SELECT" --fail-fast \
+            --state "${{ github.workspace }}/state" --defer 2>&1 | tee build.log
+          exit "${PIPESTATUS[0]}"
+
+      - name: Résumé
+        if: always()
+        working-directory: dbt
+        run: |
+          {
+            echo "### dbt build — sélection \`$DBT_SELECT\`"
+            echo '```'
+            grep -E "Done\.|Nothing to do|ERROR|FAIL|WARN" build.log | tail -20 || echo "(pas de journal)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
