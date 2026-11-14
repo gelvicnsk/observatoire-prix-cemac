@@ -90,12 +90,17 @@ class Layer:
         self._tree = STRtree([a.geometry for a in areas]) if areas else None
         self._by_name = {normalize(a.name): a for a in areas}
 
-    def locate(self, point: Point) -> tuple[Area | None, str, float | None]:
+    def locate(self, point: Point, expected_name: str | None = None) -> tuple[Area | None, str, float | None]:
+        """Polygone contenant le point. Si plusieurs polygones se superposent (défaut des contours), on prend
+        celui dont le nom correspond au nom attendu, et la méthode « polygones_superposes » le signale."""
         if self._tree is None:
             return None, "sans_contours", None
-        hits = self._tree.query(point, predicate="intersects")
-        if len(hits):
-            return self.areas[int(sorted(hits)[0])], "point_in_polygon", 0.0
+        hits = [self.areas[int(i)] for i in sorted(self._tree.query(point, predicate="intersects"))]
+        if len(hits) == 1:
+            return hits[0], "point_in_polygon", 0.0
+        if hits:
+            named = [a for a in hits if expected_name and normalize(a.name) == normalize(expected_name)]
+            return (named or hits)[0], "polygones_superposes", 0.0
         nearest = int(self._tree.nearest(point))
         area = self.areas[nearest]
         distance = _distance_km(point, area.geometry)
@@ -199,8 +204,8 @@ def match_markets(
             method = "sans_contours"
         elif has_coords:
             point = Point(market.longitude, market.latitude)
-            adm2, method, distance = adm2_layer.locate(point)
-            adm1, _, _ = adm1_layer.locate(point)
+            adm2, method, distance = adm2_layer.locate(point, market.admin2_name)
+            adm1, _, _ = adm1_layer.locate(point, market.admin1_name)
         else:
             adm2 = adm2_layer.by_name(market.admin2_name)
             adm1 = adm1_layer.by_name(market.admin1_name)

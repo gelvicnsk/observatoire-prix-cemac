@@ -1,8 +1,15 @@
 -- Pluie CHIRPS par unité administrative et par décade, dernière version publiée pour chaque pays.
--- Le fichier « adm2 » contient aussi des lignes de niveau région (code à 4 caractères, ex. CG01)
--- à côté des districts (6 caractères, ex. CG0101) : le niveau est déduit de la longueur du code.
+-- Le fichier « adm2 » contient aussi des lignes de niveau région à côté des districts. Chaque pays a
+-- exactement deux formes de code, mais pas la même longueur d'un pays à l'autre :
+--   CG01 / CG0101, CF11 / CF111, CM001 / CM001001, GQ198 / GQ198002, TCD01 / TCD0101.
+-- Règle : dans chaque pays, la forme qui a le moins de chiffres est la région (1), l'autre le district (2).
 with latest as (
     {{ latest_snapshot(source('bronze', 'rainfall_adm2'), 'country') }}
+),
+
+coded as (
+    select *, length(regexp_replace(pcode, r'^[A-Z]+', '')) as pcode_digits
+    from latest
 )
 
 select
@@ -10,7 +17,10 @@ select
     date_trunc(date, month)                 as rainfall_month,
     country_iso3,
     pcode,
-    case length(pcode) when 4 then 1 when 6 then 2 end as admin_level,
+    case pcode_digits
+        when min(pcode_digits) over (partition by country_iso3) then 1
+        when max(pcode_digits) over (partition by country_iso3) then 2
+    end                                     as admin_level,
     adm2_id                                 as wfp_admin_id,
     n_pixels,
     rfh                                     as rainfall_mm,
@@ -25,4 +35,4 @@ select
     version                                 as data_version,
     source_sha256,
     ingested_at
-from latest
+from coded

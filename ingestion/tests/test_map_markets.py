@@ -92,3 +92,23 @@ def test_country_without_boundaries():
     rows = match_markets([Market("GAB", "Libreville", None, None, None, 0.4, 9.4)], {"GAB": {}}, set())
     assert rows[0]["method"] == "sans_contours"
     assert rows[0]["status"] == "a_verifier"
+
+
+def test_overlapping_polygons_prefer_the_expected_name():
+    admin2 = {
+        "type": "FeatureCollection",
+        "features": [
+            _square(0, 0, 2, {"adm2_pcode": "TD0906", "adm2_name": "Monts de Lam"}),
+            _square(1, 0, 2, {"adm2_pcode": "TD0801", "adm2_name": "Lac Wey"}),
+        ],
+    }
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("tcd_admin2.geojson", json.dumps(admin2))
+    layers = {"TCD": layers_from_geojson_zip(buffer.getvalue())}
+    market = Market("TCD", "Moundou", None, None, "Lac Wey", 0.5, 1.5)  # dans les deux carrés
+
+    row = match_markets([market], layers, {("TCD", "TD0801")})[0]
+
+    assert (row["method"], row["adm2_pcode"], row["name_matches"]) == ("polygones_superposes", "TD0801", "true")
+    assert row["status"] == "a_verifier"

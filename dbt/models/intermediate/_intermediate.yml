@@ -17,6 +17,7 @@ models:
               arguments: {values: [1, 2], quote: false}
       - name: admin_level
         data_tests:
+          - not_null   # un code de forme inconnue donnerait null sans ce test
           - accepted_values:
               arguments: {values: [1, 2], quote: false}
       - name: rainfall_pct_of_normal

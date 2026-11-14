@@ -158,7 +158,7 @@ TCD,Binder,8408,9.96,14.47,TCD12,MAYO KEBBI OUEST,TCD1203,Mayo Binder,point_in_p
 TCD,Bitkine,2719,11.98,18.21,TCD04,GUÉRA,TCD0402,Abtouyour,point_in_polygon,0.0,Abtouyour,true,false,TCD0402,2,auto
 TCD,Bodo,2710,8.29,17.14,TCD09,LOGONE ORIENTAL,TCD0902,Kouh Est,point_in_polygon,0.0,Kouh-Est,true,false,TCD0902,2,auto
 TCD,Bokoro,2296,12.38,17.06,TCD05,HADJER LAMIS,TCD0502,Dababa,point_in_polygon,0.0,Dababa,true,false,TCD0502,2,auto
-TCD,Bol,229,13.5,14.68,TCD07,LAC,TCD0703,Kaya,point_in_polygon,0.0,Mamdi,false,false,TCD0703,2,a_verifier
+TCD,Bol,229,13.459,14.7147,TCD07,LAC,TCD0701,Mamdi,manuel,0.0,Mamdi,true,false,TCD07,1,relu
 TCD,Bongor,1964,10.28,15.39,TCD11,MAYO KEBBI EST,TCD1101,Mayo Boneye,point_in_polygon,0.0,Mayo Boneye,true,false,TCD1101,2,auto
 TCD,Bousso,2287,10.48,16.71,TCD03,CHARI BAGUIRMI,TCD0303,Loug Chari,point_in_polygon,0.0,Loug-Chari,true,false,TCD0303,2,auto
 TCD,Danamadji,5618,8.75,18.55,TCD13,MOYEN CHARI,TCD1302,Grande Sido,point_in_polygon,0.0,Grande Sido,true,false,TCD1302,2,auto
@@ -194,7 +194,7 @@ TCD,Melfi,2755,11.06,17.93,TCD04,GUÉRA,TCD0403,Bahar Signaka,point_in_polygon,0
 TCD,Moissala,2283,8.34,17.76,TCD10,MANDOUL,TCD1002,Barh Sara,point_in_polygon,0.0,Barh-Sara,true,false,TCD1002,2,auto
 TCD,Mondo,2718,13.78,15.53,TCD06,KANEM,TCD0603,Wadi Bissam,point_in_polygon,0.0,Wadi-Bissam,true,false,TCD0603,2,auto
 TCD,Mongo,231,12.18,18.69,TCD04,GUÉRA,TCD0401,Guéra,point_in_polygon,0.0,Guera,true,false,TCD0401,2,auto
-TCD,Moundou,232,8.5667,16.0833,TCD09,LOGONE ORIENTAL,TCD0906,Monts de lam,point_in_polygon,0.0,Lac Wey,false,false,TCD0906,2,a_verifier
+TCD,Moundou,232,8.5667,16.0833,TCD08,LOGONE OCCIDENTAL,TCD0801,Lac wey,manuel,0.0,Lac Wey,true,false,TCD0801,2,relu
 TCD,Moussoro,233,13.64,16.49,TCD19,BARH EL GAZEL,TCD1901,Barh El Gazel Sud,point_in_polygon,0.0,Barh El Gazel Sud,true,false,TCD1901,2,auto
 TCD,N'djamena (Atrone),4515,12.09,15.13,TCD18,N'DJAMENA,TCD1801,N'Djamena,point_in_polygon,0.0,Ndjamena,true,false,TCD1801,2,auto
 TCD,National Average,1965,,,,,,,sans_coordonnees,,,false,false,,,exclu
@@ -202,7 +202,7 @@ TCD,Ndjamena,234,12.11,15.04,TCD18,N'DJAMENA,TCD1801,N'Djamena,point_in_polygon,
 TCD,Ndjamena (Marche A Mil),4480,12.11,15.06,TCD18,N'DJAMENA,TCD1801,N'Djamena,point_in_polygon,0.0,Ndjamena,true,false,TCD1801,2,auto
 TCD,Ngouri,2297,13.64,15.37,TCD07,LAC,TCD0702,Wayi,point_in_polygon,0.0,Wayi,true,false,TCD0702,2,auto
 TCD,Nokou,2291,14.58,14.78,TCD06,KANEM,TCD0602,Nord Kanem,point_in_polygon,0.0,Nord-Kanem,true,false,TCD0602,2,auto
-TCD,Oum Hadjer,2280,13.295,19.6966,TCD01,BATHA,TCD0102,Batha Est,point_in_polygon,0.0,,false,false,TCD0102,2,a_verifier
+TCD,Oum Hadjer,2280,13.295,19.6966,TCD01,BATHA,TCD0102,Batha Est,point_in_polygon,0.0,,false,false,TCD0102,2,relu
 TCD,Oumhadjer,5623,13.23,19.24,TCD01,BATHA,TCD0102,Batha Est,point_in_polygon,0.0,Batha-Est,true,false,TCD0102,2,auto
 TCD,Pala,2288,9.37,14.91,TCD12,MAYO KEBBI OUEST,TCD1201,Mayo Dallah,point_in_polygon,0.0,Mayo-Dallah,true,false,TCD1201,2,auto
 TCD,Peni,2284,8.8,17.3,TCD10,MANDOUL,TCD1003,Mandoul Occidental,point_in_polygon,0.0,Mandoul Occidental,true,false,TCD1003,2,auto

@@ -90,7 +90,7 @@ seeds:
         data_tests:
           - accepted_values:
               arguments:
-                values: ['point_in_polygon', 'nearest_polygon', 'nom_admin2', 'sans_coordonnees',
+                values: ['point_in_polygon', 'polygones_superposes', 'nearest_polygon', 'nom_admin2', 'sans_coordonnees',
                          'hors_contours', 'sans_contours', 'manuel']
       - name: rainfall_pcode
         description: Code présent dans int_chirps__rainfall_dekads (district, ou région à défaut).

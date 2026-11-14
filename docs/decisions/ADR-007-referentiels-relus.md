@@ -56,3 +56,14 @@ Les écarts à la normale publiés par le PAM (`rfq`, `r1q`, `r3q`) ne suivent p
 On les garde tels quels (`published_*_anomaly_pct`), mais l'observatoire utilise son propre indicateur,
 documenté : `rainfall_pct_of_normal` = 100 × pluie / normale 1989-2018. Il vaut null quand la normale est
 inférieure à 1 mm, en saison sèche, où un rapport n'a pas de sens.
+
+## Défauts constatés dans les contours COD-AB du Tchad (2025)
+
+Les polygones de Monts de Lam et de Kaya recouvrent respectivement Moundou, chef-lieu de Lac Wey, et Bol,
+chef-lieu de Mamdi. Il n'y a pas de chevauchement : un seul polygone contient chaque point. Les deux marchés
+sont donc rattachés à la main (méthode `manuel`), au district indiqué par le PAM. Le script signale désormais
+les polygones superposés (`polygones_superposes`) au lieu d'en choisir un sans le dire.
+
+Mamdi (TCD0701) n'existe pas dans CHIRPS : la pluie de Bol est prise au niveau de la province du Lac (TCD07).
+Hypothèse non vérifiée : l'une des deux zones portant le code TCD0703 (Kaya) serait Mamdi, codée par erreur par le PAM.
+Dans ce cas, la fusion pondérée de TCD0703 mélangerait la pluie de Kaya et celle de Mamdi.
