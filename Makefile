@@ -10,7 +10,7 @@ DBT := dbt
 ENV ?= dev
 MONTH ?= $(shell date -d "last month" +%Y-%m)
 
-.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run backfill seeds-reference seeds-markets seeds-review dbt-deps dbt-build dbt-freshness dbt-docs
+.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run backfill seeds-reference seeds-markets seeds-review reconcile dbt-deps dbt-build dbt-freshness dbt-docs
 
 help:
 	@grep -E '^[a-z-]+:' Makefile | cut -d: -f1
@@ -75,6 +75,9 @@ seeds-markets:      ## étape 5B : rattache les marchés aux districts COD-AB (s
 
 seeds-review:       ## étape 5B : applique la relecture versionnée (reference/review/*.csv)
 	python -m scripts.apply_review
+
+reconcile:          ## étape 6 : recalcule les prix mensuels en Python depuis bronze et les compare à dbt
+	python -m quality.reconcile --project $(GCP_PROJECT_ID) --bucket $(GCS_RAW_BUCKET)
 
 dbt-deps:           ## étape 5 : paquets dbt (dbt_utils, version figée)
 	$(DBT) deps

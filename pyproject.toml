@@ -41,7 +41,7 @@ target-version = "py311"
 select = ["E", "F", "I", "B", "UP", "SIM"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["ingestion", "scripts"]
+known-first-party = ["ingestion", "scripts", "quality"]
 
 [build-system]
 requires = ["setuptools>=68"]

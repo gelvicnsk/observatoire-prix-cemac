@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: mart_price_metrics
+    description: >
+      Évolution de chaque série de prix, mois par mois : variation sur 1 et 12 mois, moyenne et écart type des
+      24 mois précédents (sans le mois testé), z-score, niveau d'alerte. Relevés suspects exclus.
+    columns:
+      - name: price_monthly_id
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments: {to: ref('fct_price_monthly'), field: price_monthly_id}
+      - name: reference_months
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments: {expression: "between 0 and {{ var('alert_reference_months') }}"}
+      - name: alert_level
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['moderee', 'forte']}
+          # jamais d'alerte sans historique suffisant
+          - dbt_utils.expression_is_true:
+              arguments: {expression: "is null"}
+              config: {where: "not has_enough_history"}
+
+  - name: mart_price_alerts
+    description: Les mois en alerte, avec les noms du marché, du produit et du pays.
+    columns:
+      - name: price_monthly_id
+        data_tests: [unique, not_null]
+      - name: alert_level
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: ['moderee', 'forte']}
+
+  - name: mart_data_freshness
+    description: Dernier relevé de prix par pays ; is_stale signale un pays actif sans nouveauté depuis 3 mois.
+    columns:
+      - name: country_iso3
+        data_tests: [unique, not_null]
