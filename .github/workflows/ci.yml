@@ -32,7 +32,7 @@ jobs:
           cache: pip
 
       - name: Installer
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,geo]"
 
       - name: Lint
         run: ruff check .

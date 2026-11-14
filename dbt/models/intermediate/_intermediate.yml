@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: int_chirps__rainfall_dekads
+    description: >
+      Pluie CHIRPS dédoublonnée : une ligne par pays, code administratif et décade. Les deux codes du Tchad
+      portés par deux zones sont fusionnés (moyenne pondérée par les pixels) ; n_source_areas vaut alors 2.
+      published_*_anomaly_pct : écarts publiés par le PAM (formule non documentée) ;
+      rainfall_*_pct_of_normal : pluie en % de la normale, calculée ici, null si la normale est inférieure à 1 mm.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [country_iso3, pcode, dekad_start_date]}
+    columns:
+      - name: n_source_areas
+        data_tests:
+          - accepted_values:
+              arguments: {values: [1, 2], quote: false}
+      - name: admin_level
+        data_tests:
+          - not_null   # un code de forme inconnue donnerait null sans ce test
+          - accepted_values:
+              arguments: {values: [1, 2], quote: false}
+      - name: rainfall_pct_of_normal
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments: {expression: ">= 0"}
+      - name: rainfall_3m_pct_of_normal
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments: {expression: ">= 0"}

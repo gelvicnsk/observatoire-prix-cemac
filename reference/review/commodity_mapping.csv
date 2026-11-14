@@ -1,0 +1,37 @@
+commodity_raw,name_fr,include_in_index,status,review_note
+"Beans (green, fresh)",Haricots verts (frais),,,
+Beans (niebe),Niébé,,,niébé = cowpea
+"Beans (niebe, red)",Niébé (rouge),,,
+Cassava (cossette),Manioc (cossettes),,,
+Cassava meal (foufou),Farine de manioc (foufou),,,
+Cassava meal (gari),Gari,,,
+Chicken,Poulet,,,
+Cocoyam (macabo),Macabo,,,
+Exchange rate,Taux de change,false,,Pas un produit
+Fish (catfish),Poisson-chat (silure),,,
+"Fish (mackerel, fresh)",Maquereau (frais),,,
+Fish (salted),Poisson (salé),,,
+"Fish (sardine, canned)",Sardines (en conserve),,,
+"Fish (tilapia, salted, dried)","Tilapia (salé, séché)",,,
+Fuel (gas),Gaz domestique (butane),false,,Vendu au kg en Centrafrique (35 relevés) : gaz de cuisine
+Groundnuts (paste),Pâte d'arachide,,,
+Laundry detergent,Lessive,,,
+Laundry soap,Savon de lessive,,,
+Leafy vegetables,Légumes-feuilles,,,
+"Livestock (goat, medium-sized castrated male)","Chèvre sur pied (mâle castré, taille moyenne)",false,,Bétail vendu par tête : hors panier
+"Livestock (sheep, medium-sized castrated male)","Mouton sur pied (mâle castré, taille moyenne)",false,,Bétail vendu par tête : hors panier
+"Meat (antelope, smoked)",Viande d'antilope (fumée),,,
+"Meat (gazelle, smoked)",Viande de gazelle (fumée),,,
+"Milk (cow, pasteurized)",Lait de vache (pasteurisé),,,
+Oil (cotton),Huile de coton,,,
+"Oil (vegetable, bulk)",Huile végétale (vrac),,,
+Pasta (spaghetti),Spaghetti,,,
+Peanut,Arachide,,,
+Potatoes (Irish),Pomme de terre,,,
+"Rice (mixed, low quality)","Riz (mélangé, qualité inférieure)",,,
+Sorghum (berbere),Sorgho berbéré,,,Sorgho de contre-saison du Tchad
+Squashes,Courges,,,
+Wage (non-qualified labour),Salaire journalier (main-d'œuvre non qualifiée),,,
+Wage (qualified labour),Salaire journalier (main-d'œuvre qualifiée),,,
+Water (drinking),Eau potable,,,
+Watermelons,Pastèques,,,

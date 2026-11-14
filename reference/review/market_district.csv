@@ -1,0 +1,38 @@
+country_iso3,market_name,status,method,adm1_pcode,adm1_name,adm2_pcode,adm2_name,name_matches,rainfall_pcode,rainfall_admin_level,review_note
+CAF,Bangui,,,,,,,,,,Bangui découpé en arrondissements dans le COD-AB 2024 : polygone retenu ; pluie au niveau préfecture
+CAF,Bimbo,,,,,,,,,,Polygone retenu (Bangui-Fleuve) ; pluie au niveau préfecture
+CAF,Bégoua,,,,,,,,,,Polygone retenu (Bangui-Kagas) ; pluie au niveau préfecture
+CAF,Combattant,,,,,,,,,,Polygone retenu (Bangui-Centre)
+CAF,Gobongo,,,,,,,,,,Polygone retenu (Bangui-Kagas) ; pluie au niveau préfecture
+CAF,PK5,,,,,,,,,,Polygone retenu (Bangui-Rapides) ; pluie au niveau préfecture
+CAF,Pétévo,,,,,,,,,,Polygone retenu (Bangui-Fleuve) ; pluie au niveau préfecture
+CAF,Birao,,,,,,,,,,Polygone retenu (Am-Dafok) ; pluie au niveau préfecture
+CAF,Batangafo,,,,,,,,,,Préfecture créée en 2020 (Ouham-Fafa) : codes absents de CHIRPS ; pas de pluie
+CAF,Bouca,,,,,,,,,,Préfecture créée en 2020 (Ouham-Fafa) : codes absents de CHIRPS ; pas de pluie
+CAF,Carnot,,,,,,,,,,Préfecture créée en 2020 (Mambéré) : codes absents de CHIRPS ; pas de pluie
+CAF,Paoua,,,,,,,,,,Préfecture créée en 2020 (Lim-Pendé) : codes absents de CHIRPS ; pas de pluie
+COG,Mikalou,,,,,,,,,,Coordonnées de la ville pour 3 marchés ; même district : sans effet sur la pluie
+COG,Moungali,,,,,,,,,,Coordonnées de la ville pour 3 marchés ; même district : sans effet sur la pluie
+COG,Total,,,,,,,,,,Coordonnées de la ville pour 3 marchés ; même district : sans effet sur la pluie
+GAB,Libreville,,,,,,,,,,Pas de pluie CHIRPS pour le Gabon (ADR-006)
+TCD,Adre,,,,,,,,,,Même district (orthographe)
+TCD,Am Timan,,,,,,,,,,Même district (orthographe)
+TCD,Amdam,,,,,,,,,,Même district (orthographe)
+TCD,Benoye,,,,,,,,,,Même district (orthographe)
+TCD,Doba,,,,,,,,,,Même district (orthographe)
+TCD,Gore,,,,,,,,,,Même district (accents mal encodés côté PAM)
+TCD,Gueledeng,,,,,,,,,,Même district (orthographe)
+TCD,Kalait,,,,,,,,,,Même district (orthographe)
+TCD,Lere,,,,,,,,,,Même district (accents mal encodés côté PAM)
+TCD,Mangalme,,,,,,,,,,Même district (orthographe)
+TCD,Mbaïnamar,,,,,,,,,,Même district (orthographe)
+TCD,Melfi,,,,,,,,,,Même district (orthographe)
+TCD,Pont Karol,,,,,,,,,,Même district (orthographe)
+TCD,Sarh,,,,,,,,,,Même district (accents mal encodés côté PAM)
+TCD,Zouar,,,,,,,,,,Même district (orthographe)
+TCD,Iriba,,,,,,,,,,Iriba est le chef-lieu du département de Kobé : polygone retenu
+TCD,Faya,,,,,,,,,,Borkou découpé dans le COD-AB 2025 : polygone retenu ; pluie au niveau province
+TCD,National Average,exclu,,,,,,,,,"Moyenne nationale du PAM, pas un marché : exclue des faits"
+TCD,Oum Hadjer,,,,,,,,,,Chef-lieu de Batha Est : polygone retenu (coordonnées corrigées)
+TCD,Moundou,,manuel,TCD08,LOGONE OCCIDENTAL,TCD0801,Lac wey,true,TCD0801,2,Chef-lieu de Lac Wey ; le polygone COD-AB 2025 voisin recouvre la ville : rattachement manuel
+TCD,Bol,,manuel,TCD07,LAC,TCD0701,Mamdi,true,TCD07,1,Chef-lieu de Mamdi ; le polygone COD-AB 2025 de Kaya recouvre la ville : rattachement manuel. Mamdi (TCD0701) absent de CHIRPS : pluie au niveau de la province

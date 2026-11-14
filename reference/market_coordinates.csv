@@ -1,0 +1,4 @@
+country_iso3,market_name,latitude,longitude,source
+TCD,Oum Hadjer,13.2950,19.6966,"Absentes du PAM. Centre de la ville, à confirmer sur openstreetmap.org"
+TCD,Moundou,8.5667,16.0833,"Le point du PAM tombe dans Monts de Lam, au sud. Centre de la ville, à confirmer sur openstreetmap.org"
+TCD,Bol,13.4590,14.7147,"Point du PAM arrondi (13.5, 14.68), qui déborde dans Kaya. Centre de la ville, à confirmer sur openstreetmap.org"
