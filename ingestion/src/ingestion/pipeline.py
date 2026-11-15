@@ -4,6 +4,11 @@ Idempotence : un fichier dont l'empreinte est déjà connue pour la même source
 est ignoré ; et comme les chemins dépendent de l'empreinte, réécrire un fichier produit le même objet.
 L'enregistrement dans `processed_files` se fait en dernier : une panne avant lui fait simplement
 retraiter le fichier au run suivant, sans doublon.
+
+Quarantaine (ADR-012) : un fichier téléchargé mais refusé (colonnes attendues absentes, valeur impossible à
+typer) n'arrête pas le run. Son contenu d'origine est déposé dans `_quarantine/`, et l'échec est journalisé
+avec le statut `quarantined`. Comme il n'est pas enregistré dans `processed_files`, il est retraité dès que
+le code ou la source est corrigé : au run suivant, ou tout de suite avec `python -m ingestion.replay`.
 """
 
 from __future__ import annotations
@@ -33,7 +38,7 @@ CONTENT_TYPES = {"csv": "text/csv", "json": "application/json"}
 class Outcome:
     source: str
     partition_key: str
-    status: str  # success | skipped | failed
+    status: str  # success | skipped | quarantined | failed
     rows: int
     message: str
 
@@ -57,12 +62,36 @@ def parse(raw: RawFile, sha256: str, ingested_at: datetime, run_id: str) -> pa.T
     raise ValueError(f"source inconnue : {raw.source}")
 
 
+QUARANTINE_PREFIX = "_quarantine/"
+
+
+def _prefix(raw: RawFile, ingest_date: date) -> str:
+    partitions = "/".join(f"{k}={v}" for k, v in raw.partitions.items())
+    return f"{raw.source}/{partitions + '/' if partitions else ''}ingest_date={ingest_date.isoformat()}"
+
+
 def object_paths(raw: RawFile, ingest_date: date, sha256: str) -> tuple[str, str]:
     """(original, parquet) — partitions au format Hive, lues par les tables externes BigQuery."""
-    partitions = "/".join(f"{k}={v}" for k, v in raw.partitions.items())
-    prefix = f"{raw.source}/{partitions + '/' if partitions else ''}ingest_date={ingest_date.isoformat()}"
-    name = sha256[:16]
+    prefix, name = _prefix(raw, ingest_date), sha256[:16]
     return f"_landing/{prefix}/{name}.{raw.extension}", f"{prefix}/{name}.parquet"
+
+
+def quarantine_path(raw: RawFile, ingest_date: date, sha256: str) -> str:
+    return f"{QUARANTINE_PREFIX}{_prefix(raw, ingest_date)}/{sha256[:16]}.{raw.extension}"
+
+
+def raw_from_quarantine_path(path: str, content: bytes) -> RawFile:
+    """Reconstruit le fichier brut d'origine depuis son chemin de quarantaine (pour le rejouer)."""
+    parts = path.removeprefix(QUARANTINE_PREFIX).split("/")
+    source, *middle, name = parts
+    partitions = dict(p.split("=", 1) for p in middle if not p.startswith("ingest_date="))
+    return RawFile(
+        source=source,
+        partitions=partitions,
+        content=content,
+        extension=name.rsplit(".", 1)[1],
+        url=f"quarantine:{path}",
+    )
 
 
 def process(raw: RawFile, store, meta: MetaStore, ingest_date: date, run_id: str) -> Outcome:
@@ -105,6 +134,17 @@ def process(raw: RawFile, store, meta: MetaStore, ingest_date: date, run_id: str
         )
     )
     return finish("success", table.num_rows, f"{table.num_rows} lignes, sha256 {sha256[:12]}…")
+
+
+def quarantine(raw: RawFile, error: Exception, store, meta: MetaStore, ingest_date: date, run_id: str) -> Outcome:
+    """Fichier reçu mais refusé : on garde son contenu d'origine en quarantaine, et le run continue."""
+    moment = now_utc().isoformat()
+    sha256 = hashlib.sha256(raw.content).hexdigest()
+    path = quarantine_path(raw, ingest_date, sha256)
+    store.write_bytes(path, raw.content, CONTENT_TYPES[raw.extension])
+    message = f"{type(error).__name__} : {error}"[:900] + f" | quarantaine={path}"
+    meta.log(LoadLogEntry(run_id, raw.source, raw.partition_key, "quarantined", 0, message, moment, moment))
+    return Outcome(raw.source, raw.partition_key, "quarantined", 0, message)
 
 
 def fail(raw_source: str, partition_key: str, error: Exception, meta: MetaStore, run_id: str) -> Outcome:

@@ -5,8 +5,9 @@ Le calcul ne réutilise rien du SQL de dbt. Il repart des fichiers Parquet bronz
 pays, comme le prévoit l'ADR-005) et des trois référentiels versionnés (dbt/seeds), puis applique les mêmes
 règles, écrites une seconde fois :
 
-- lignes écartées : marché exclu, produit hors panier, unité exclue ou sans poids, prévision du PAM,
-  ou sans correspondance dans un référentiel ;
+- lignes en quarantaine (ADR-012) : champ obligatoire vide, prix nul ou négatif, devise autre que XAF,
+  type de prix inconnu, doublon, ou absente d'un référentiel ;
+- lignes écartées : marché exclu, produit hors panier, unité exclue ou sans poids, prévision du PAM ;
 - prix au kg ou au litre = prix / facteur de l'unité, arrondi à 4 décimales ;
 - une ligne par pays, marché, produit (nom français), type de prix, unité de base et mois : moyenne arrondie.
 
@@ -106,8 +107,20 @@ def expected_monthly(prices: pd.DataFrame, seeds: dict[str, pd.DataFrame]) -> pd
         columns={"status": "market_status"}
     )
 
+    # Quarantaine : mêmes règles que int_wfp__prices_checked, écrites une seconde fois
+    key = ["country_iso3", "market", "commodity", "unit", "pricetype", "priceflag", "date"]
+    # comme dans dbt, un doublon se compte sur toutes les lignes, avant tout autre filtre
+    unique_key = ~prices.duplicated(subset=key, keep=False)
+    required = prices[["date", "market", "commodity", "unit", "price"]].notna().all(axis=1)
+    valid = prices[unique_key & required].copy()
+    valid = valid[
+        (valid["price"].map(lambda p: p > 0))
+        & (valid["currency"] == "XAF")
+        & (valid["pricetype"].isin(["Retail", "Wholesale"]))
+    ]
+
     frame = (
-        prices.rename(columns={"market": "market_name", "pricetype": "price_type"})
+        valid.rename(columns={"market": "market_name", "pricetype": "price_type"})
         .merge(commodities, left_on="commodity", right_on="commodity_raw", how="inner")
         .merge(units, left_on="unit", right_on="unit_raw", how="inner")
         .merge(markets, on=["country_iso3", "market_name"], how="inner")

@@ -42,22 +42,63 @@ models:
 
   - name: int_wfp__prices_normalized
     description: >
-      Prix du PAM rapprochés des référentiels et ramenés au kg ou au litre. exclusion_reason dit pourquoi une
-      ligne ne va pas dans les faits (null = retenue). is_suspect : hors d'un facteur 10 de la médiane.
+      Prix du PAM valides (sortis verts de int_wfp__prices_checked), ramenés au kg ou au litre. exclusion_reason
+      dit pourquoi une ligne valide ne va pas dans les faits (null = retenue). is_suspect : hors d'un facteur 10
+      de la médiane.
     columns:
       - name: price_observation_id
         data_tests: [unique, not_null]
+      - name: price_local
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments: {expression: "> 0"}
+      - name: currency_code
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['XAF']}
       - name: exclusion_reason
         data_tests:
           - accepted_values:
               arguments:
-                values: ['marche_exclu', 'produit_hors_panier', 'unite_exclue', 'unite_sans_poids', 'prevision',
-                         'sans_correspondance']
-          # une ligne sans correspondance veut dire qu'un référentiel est à compléter (make seeds-reference)
-          - dbt_utils.expression_is_true:
-              arguments: {expression: "!= 'sans_correspondance'"}
-              config: {severity: warn}
+                values: ['marche_exclu', 'produit_hors_panier', 'unite_exclue', 'unite_sans_poids', 'prevision']
       - name: price_xaf_per_unit
         data_tests:
           - not_null:
               config: {where: "exclusion_reason is null"}
+
+  # Aiguillages (ADR-012) : un motif de quarantaine par ligne, ou null si elle passe
+  - name: int_wfp__prices_checked
+    description: Prix du PAM avec leur motif de quarantaine (null = la ligne passe).
+    columns:
+      - name: quarantine_reason
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['champ_obligatoire_vide', 'prix_nul_ou_negatif', 'devise_inattendue', 'type_de_prix_inconnu',
+                         'doublon', 'produit_absent_du_referentiel', 'unite_absente_du_referentiel',
+                         'marche_absent_du_referentiel']
+
+  - name: int_chirps__rainfall_checked
+    description: Pluie CHIRPS avec son motif de quarantaine (null = la ligne passe).
+    columns:
+      - name: quarantine_reason
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['champ_obligatoire_vide', 'code_administratif_de_forme_inconnue', 'pluie_negative', 'doublon']
+
+  - name: int_world_bank__indicators_checked
+    description: Indicateurs de la Banque mondiale avec leur motif de quarantaine (null = la ligne passe).
+    columns:
+      - name: quarantine_reason
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['indicateur_inconnu', 'pays_hors_cemac', 'doublon']}
+
+  - name: int_ecb__fx_checked
+    description: Taux de change BCE avec leur motif de quarantaine (null = la ligne passe).
+    columns:
+      - name: quarantine_reason
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['champ_obligatoire_vide', 'taux_aberrant', 'doublon']}

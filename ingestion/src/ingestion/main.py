@@ -21,7 +21,7 @@ import httpx
 from ingestion.config import CEMAC_COUNTRIES, HTTP_USER_AGENT, Settings
 from ingestion.hdx import HdxClient
 from ingestion.meta import BigQueryMeta, LocalMeta
-from ingestion.pipeline import Outcome, fail, process
+from ingestion.pipeline import Outcome, fail, process, quarantine
 from ingestion.sources import exchange_rates, hdx_rainfall, hdx_wfp, world_bank
 from ingestion.storage import GcsStore, LocalStore
 
@@ -55,8 +55,8 @@ def run(
             return
         try:
             outcomes.append(process(raw, store, meta, ingest_date, run_id))
-        except Exception as error:  # noqa: BLE001
-            outcomes.append(fail(source, partition_key, error, meta, run_id))
+        except Exception as error:  # noqa: BLE001 - fichier refusé : en quarantaine, le run continue
+            outcomes.append(quarantine(raw, error, store, meta, ingest_date, run_id))
 
     if "wfp" in sources:
         for iso3 in countries:
@@ -133,6 +133,11 @@ def main(argv: list[str] | None = None, hdx: HdxClient | None = None, http: http
             print(f"Tables externes non mises à jour : {error}", file=sys.stderr)
             return 1
 
+    # Un fichier en quarantaine ne fait pas échouer le job : il est visible dans meta.load_log et dans
+    # quarantine.qrt_ingestion__files (ADR-012). Seul un échec de téléchargement, sans contenu à garder, le fait.
+    quarantined = [o for o in outcomes if o.status == "quarantined"]
+    if quarantined:
+        print(f"{len(quarantined)} fichier(s) en quarantaine : voir meta.load_log", file=sys.stderr)
     failed = [o for o in outcomes if o.status == "failed"]
     return 1 if failed else 0
 

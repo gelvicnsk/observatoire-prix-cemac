@@ -14,7 +14,8 @@
 -- et on calcule notre propre indicateur, documenté, rainfall_pct_of_normal, utilisé dans gold.
 with source as (
     select *, coalesce(n_pixels, 1) as weight
-    from {{ ref('stg_chirps__rainfall_dekads') }}
+    from {{ ref('int_chirps__rainfall_checked') }}
+    where quarantine_reason is null
 ),
 
 merged as (

@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: mart_pipeline_status
+    description: >
+      Ce qui est passé (vert) et ce qui est en quarantaine (rouge), à chaque étape, par source et par motif
+      (ADR-012). Source du panneau « État du pipeline » du tableau de bord.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [stage, source, outcome]}
+    columns:
+      - name: color
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['vert', 'rouge']}

@@ -3,41 +3,24 @@
     cluster_by=['country_iso3', 'commodity_name_fr']
 ) }}
 
--- Prix du PAM rapprochés des trois référentiels (étape 5B), ramenés au kg ou au litre.
+-- Prix du PAM qui ont passé l'aiguillage (int_wfp__prices_checked, ADR-012), ramenés au kg ou au litre.
+-- Les lignes refusées (champ vide, prix négatif, produit absent du référentiel…) sont dans qrt_wfp__prices.
 --
--- Toutes les lignes sont gardées. Celles qui ne vont pas dans les faits portent un motif dans
--- exclusion_reason (le premier motif rencontré, dans l'ordre ci-dessous). Les faits filtrent sur
+-- Parmi les lignes valides, certaines ne vont pas dans les faits, par choix et non par erreur : elles portent
+-- un motif dans exclusion_reason (le premier rencontré, dans l'ordre ci-dessous). Les faits filtrent sur
 -- exclusion_reason is null, et l'on peut toujours compter ce qui a été mis de côté, et pourquoi.
 --
 -- is_suspect : prix hors d'un facteur 10 de la médiane du même produit, type de prix et unité de base dans
 -- le pays (sur tout l'historique). La ligne reste dans les faits, mais sera exclue des alertes (étape 6).
-with prices as (
-    select * from {{ ref('stg_wfp__prices') }}
-),
-
-joined as (
-    select
-        p.*,
-        c.name_fr                                   as commodity_name_fr,
-        c.group_fr                                  as commodity_group_fr,
-        c.include_in_index,
-        u.base_unit,
-        u.factor_to_base,
-        u.status                                    as unit_status,
-        m.status                                    as market_status
-    from prices as p
-    left join {{ ref('commodity_mapping') }} as c on c.commodity_raw = p.commodity_name
-    left join {{ ref('unit_conversion') }} as u on u.unit_raw = p.unit_raw
-    left join {{ ref('market_district') }} as m
-        on m.country_iso3 = p.country_iso3 and m.market_name = p.market_name
+with joined as (
+    select * from {{ ref('int_wfp__prices_checked') }}
+    where quarantine_reason is null
 ),
 
 classified as (
     select
         *,
         case
-            when commodity_name_fr is null or unit_status is null or market_status is null
-                then 'sans_correspondance'
             when market_status = 'exclu' then 'marche_exclu'
             when not include_in_index then 'produit_hors_panier'
             when unit_status = 'exclu' then 'unite_exclue'

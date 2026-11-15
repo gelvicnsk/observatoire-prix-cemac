@@ -15,7 +15,8 @@ les normalise et signale les hausses anormales par marché et par produit.
 | **Alertes** | hausse anormale = z-score ET hausse sur 1 mois, seuils calibrés sur les données : environ 20 alertes par mois au Tchad, 6 au Cameroun, 3 en Centrafrique |
 | **Plateforme** | GCP en Terraform (dev et prod) ; deux Cloud Run Jobs lancés chaque mois par Cloud Scheduler ; BigQuery bronze → silver → gold |
 | **CI/CD** | 5 contrôles obligatoires sur chaque pull request ; déploiement dev avec test de fumée, puis prod après validation ; aucune clé de service (Workload Identity) |
-| **Décisions** | 11 ADR dans [`docs/decisions/`](docs/decisions/) |
+| **Quarantaine** | à chaque étape, les données refusées partent dans une branche rouge avec leur motif, et reviennent seules une fois corrigées ; le run continue avec le reste (ADR-012) |
+| **Décisions** | 12 ADR dans [`docs/decisions/`](docs/decisions/) |
 
 ```mermaid
 flowchart LR
@@ -29,7 +30,9 @@ flowchart LR
         ING["Cloud Run Job<br/>obs-ingestion"]
         RAW[("Cloud Storage<br/>raw, Parquet")]
         subgraph BQ["BigQuery"]
-            BR["bronze<br/>tables externes"] --> SI["silver<br/>normalisé"] --> GO["gold<br/>faits, alertes"]
+            BR["bronze<br/>tables externes"] --> AI{"aiguillage<br/>int_*_checked"}
+            AI -- "valide" --> SI["silver<br/>normalisé"] --> GO["gold<br/>faits, alertes"]
+            AI -- "refusé" --> QR["quarantine<br/>qrt_*, avec motif"]
             EL["elementary<br/>historique des contrôles"]
         end
         TR["Cloud Run Job<br/>obs-transform<br/>dbt + rapprochement"]
@@ -41,8 +44,15 @@ flowchart LR
     SCH --> TR
     TR --> SI
     TR --> EL
+    ING -- "fichier refusé" --> QF[("raw/_quarantine<br/>rejoué au run suivant")]
     TR --> REP
     GO --> LS
+    classDef ok fill:#e6f4ea,stroke:#1e8e3e,color:#0d652d
+    classDef ko fill:#fce8e6,stroke:#d93025,color:#a50e0e
+    classDef sw fill:#fef7e0,stroke:#f29900,color:#7a4a00
+    class BR,SI,GO ok
+    class QR,QF ko
+    class AI sw
 ```
 
 ---
@@ -224,6 +234,7 @@ Cloud Scheduler et deux Cloud Run Jobs suffisent.
 | `silver` | Types, unités, noms et marchés normalisés, lignes hors périmètre retirées | dbt |
 | `gold` | Faits, dimensions et marts prêts à consommer | dbt |
 | `meta` | Journal de chargement, fichiers traités, lignes mises de côté, résultats de contrôle | Ingestion, dbt |
+| `quarantine` | Lignes et fichiers refusés, avec leur motif : la branche rouge (ADR-012) | dbt |
 
 | Table (gold) | Grain : une ligne = | Contenu principal |
 |---|---|---|
@@ -238,9 +249,11 @@ Cloud Scheduler et deux Cloud Run Jobs suffisent.
 | `mart_rain_vs_price` | un marché, un mois | Indice de prix au détail (médiane, 100 = prix habituel), alertes, pluie du district en % de la normale sur 1 et 3 mois |
 | `mart_price_dashboard` | un prix mensuel | Prix, noms, position du marché et indicateurs : la source du tableau de bord |
 | `mart_data_freshness` | un pays | Dernier relevé, pays actif en retard |
+| `mart_pipeline_status` | une étape, une source, un résultat | Ce qui est passé (vert) et ce qui est en quarantaine (rouge), par motif (ADR-012) |
 
-`fct_price_monthly` est partitionnée par mois et clusterisée par pays et produit ; les modèles volumineux
-sont incrémentaux (stratégie `merge` sur la clé de grain).
+`fct_price_monthly` est partitionnée par mois et clusterisée par pays et produit. Elle est reconstruite
+entièrement à chaque run : à ce volume, c'est quelques Mo de lecture, et c'est la seule façon de garantir qu'une
+ligne partie en quarantaine disparaît aussi des faits (ADR-012).
 
 ## 7. Normalisation et règles de qualité
 
@@ -264,9 +277,9 @@ Chaque règle est une table de correspondance versionnée (seed dbt), jamais une
 |---|---|---|
 | Clé de grain unique, clés non nulles, relations vers les dimensions | error | Le run s'arrête |
 | Contrat dbt sur `fct_price_monthly` (colonnes, types) | error | Le run s'arrête |
-| Colonnes attendues absentes du fichier source | error | Le run s'arrête au lieu de charger faux |
-| Unité, produit ou marché sans correspondance | warn | Listé dans `meta`, à compléter dans les seeds |
-| Prix nul, négatif, ou hors d'un facteur 10 de la médiane du produit dans le pays | warn | Ligne marquée suspecte, exclue des alertes |
+| Ligne invalide (prix négatif, devise, doublon) ou unité, produit, marché absent d'un référentiel | warn | Ligne en quarantaine avec son motif (`quarantine.qrt_*`) ; elle revient seule une fois corrigée (ADR-012) |
+| Fichier source refusé (colonnes attendues absentes) | warn | Fichier en quarantaine (`raw/_quarantine/`), rejoué au run suivant (ADR-012) |
+| Prix hors d'un facteur 10 de la médiane du produit dans le pays | warn | Ligne marquée suspecte, exclue des alertes |
 | Aucun nouveau relevé depuis 3 mois pour un pays actif | warn | Signalé dans le tableau de bord |
 | Prix moyen recalculé en Python égal à celui de dbt | error | Le run s'arrête |
 

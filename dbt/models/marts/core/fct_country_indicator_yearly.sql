@@ -7,5 +7,6 @@ select
     year,
     value,
     obs_status
-from {{ ref('stg_world_bank__indicators') }}
-where value is not null
+from {{ ref('int_world_bank__indicators_checked') }}
+where quarantine_reason is null
+  and value is not null
