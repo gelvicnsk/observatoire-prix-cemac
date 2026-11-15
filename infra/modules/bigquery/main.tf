@@ -7,6 +7,7 @@ locals {
     meta       = "Journal de chargement, fichiers traités, lignes mises de côté, contrôles"
     ci         = "Modèles dbt construits par la CI ; tables supprimées au bout de 7 jours"
     elementary = "Historique des contrôles dbt et métriques de surveillance (Elementary)"
+    quarantine = "Lignes et fichiers refusés, avec leur motif ; rejoués automatiquement une fois corrigés"
   }
   seven_days_ms = 7 * 24 * 60 * 60 * 1000
 }

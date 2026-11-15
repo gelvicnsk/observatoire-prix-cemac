@@ -1,0 +1,36 @@
+version: 2
+
+# Branche rouge du pipeline (ADR-012). Chaque table liste ce qui a été refusé à une étape, avec son motif.
+# « warn » : le run continue avec les données valides, et le nombre de lignes en quarantaine apparaît dans
+# le résultat de dbt, dans Elementary et dans gold.mart_pipeline_status.
+
+models:
+  - name: qrt_ingestion__files
+    description: Fichiers dont la dernière tentative d'ingestion a échoué (quarantined ou failed).
+    data_tests:
+      - is_empty:
+          config: {severity: warn}
+
+  - name: qrt_wfp__prices
+    description: Prix du PAM refusés par int_wfp__prices_checked, avec leur motif.
+    data_tests:
+      - is_empty:
+          config: {severity: warn}
+
+  - name: qrt_chirps__rainfall
+    description: Lignes de pluie CHIRPS refusées par int_chirps__rainfall_checked, avec leur motif.
+    data_tests:
+      - is_empty:
+          config: {severity: warn}
+
+  - name: qrt_world_bank__indicators
+    description: Indicateurs de la Banque mondiale refusés, avec leur motif.
+    data_tests:
+      - is_empty:
+          config: {severity: warn}
+
+  - name: qrt_ecb__fx
+    description: Taux de change BCE refusés, avec leur motif.
+    data_tests:
+      - is_empty:
+          config: {severity: warn}

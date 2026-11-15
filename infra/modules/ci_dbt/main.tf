@@ -4,7 +4,8 @@
 # et lit le reste dans l'environnement dev (--defer). Le compte n'écrit donc que dans ci :
 #
 #   lit                                    écrit
-#   bronze, silver, gold, bucket raw       ci
+#   bronze, silver, gold, meta,            ci
+#   quarantine, bucket raw
 #
 # Il est utilisable depuis n'importe quelle branche du dépôt, par le pool github-plan (sans clé).
 
@@ -18,11 +19,14 @@ locals {
   member    = "serviceAccount:${google_service_account.dbt_ci.email}"
   principal = "principalSet://iam.googleapis.com/projects/${var.project_number}/locations/global/workloadIdentityPools/${var.workload_identity_pool}/attribute.repository/${var.github_repository}"
 
+  # meta : journal d'ingestion, lu par qrt_ingestion__files
   datasets = {
-    bronze = "roles/bigquery.dataViewer"
-    silver = "roles/bigquery.dataViewer"
-    gold   = "roles/bigquery.dataViewer"
-    ci     = "roles/bigquery.dataEditor"
+    bronze     = "roles/bigquery.dataViewer"
+    silver     = "roles/bigquery.dataViewer"
+    gold       = "roles/bigquery.dataViewer"
+    meta       = "roles/bigquery.dataViewer"
+    quarantine = "roles/bigquery.dataViewer"
+    ci         = "roles/bigquery.dataEditor"
   }
 }
 

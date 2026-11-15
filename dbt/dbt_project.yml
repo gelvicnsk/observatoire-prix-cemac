@@ -36,6 +36,10 @@ models:
     +persist_docs:
       relation: true
       columns: true
+    # Couleurs du lineage (dbt docs) : la branche verte des données valides, la branche rouge de la
+    # quarantaine (ADR-012)
+    +docs:
+      node_color: "#1e8e3e"
     staging:
       +schema: silver
       +materialized: view
@@ -45,6 +49,11 @@ models:
     marts:
       +schema: gold
       +materialized: table
+    quarantine:
+      +schema: quarantine
+      +materialized: table
+      +docs:
+        node_color: "#d93025"
 
 seeds:
   observatoire_cemac:

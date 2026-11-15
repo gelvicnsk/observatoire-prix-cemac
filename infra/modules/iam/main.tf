@@ -2,7 +2,7 @@
 #
 #   compte      lit                      écrit
 #   ingestion   sources publiques        bucket raw, bronze, meta
-#   dbt         raw, bronze              silver, gold, meta, elementary, bucket reports
+#   dbt         raw, bronze              silver, gold, meta, elementary, quarantine, bucket reports
 #   dashboard   gold                     rien
 
 resource "google_service_account" "ingestion" {
@@ -38,6 +38,7 @@ locals {
     dbt_gold         = { dataset = "gold", role = "roles/bigquery.dataEditor", member = local.sa.dbt }
     dbt_meta         = { dataset = "meta", role = "roles/bigquery.dataEditor", member = local.sa.dbt }
     dbt_elementary   = { dataset = "elementary", role = "roles/bigquery.dataEditor", member = local.sa.dbt }
+    dbt_quarantine   = { dataset = "quarantine", role = "roles/bigquery.dataEditor", member = local.sa.dbt }
     dashboard_gold   = { dataset = "gold", role = "roles/bigquery.dataViewer", member = local.sa.dashboard }
   }
 }

@@ -65,3 +65,12 @@ Le compte `sa-dashboard` (lecture de `gold`) est prêt pour une connexion par co
 - **saison sèche** (`rainfall_mm` renseigné) : la normale du mois est inférieure à 1 mm, comme de novembre à avril
   au Tchad. Un pourcentage de la normale n'y a pas de sens. Le cumul sur 3 mois (`rainfall_3m_pct_of_normal`)
   reste en général disponible, et c'est lui qu'il faut afficher dans la page « Pluie et prix ».
+
+## 5. État du pipeline
+
+Une quatrième source, `gold.mart_pipeline_status`, donne pour chaque étape (ingestion, silver) et chaque source
+ce qui est passé et ce qui est en quarantaine, par motif (ADR-012).
+
+- Graphique à barres empilées : dimension = `source`, répartition = `outcome`, métrique = `n`, filtre `stage`.
+- Couleurs : dans le style du graphique, attribuer le **vert** à la valeur `passe` et le **rouge** aux autres.
+- Tableau : `stage`, `source`, `outcome`, `n`, filtré sur `is_quarantined` = vrai. Ce sont les erreurs à corriger.

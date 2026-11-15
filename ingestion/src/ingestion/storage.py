@@ -16,6 +16,13 @@ class ObjectStore(Protocol):
 
     def uri(self, path: str) -> str: ...
 
+    def list(self, prefix: str) -> list[str]:
+        """Chemins des objets sous le préfixe, triés."""
+
+    def read_bytes(self, path: str) -> bytes: ...
+
+    def delete(self, path: str) -> None: ...
+
 
 class LocalStore:
     def __init__(self, root: Path):
@@ -32,6 +39,18 @@ class LocalStore:
         temporary.replace(target)
         return str(target)
 
+    def list(self, prefix: str) -> list[str]:
+        base = self.root / prefix
+        if not base.exists():
+            return []
+        return sorted(p.relative_to(self.root).as_posix() for p in base.rglob("*") if p.is_file())
+
+    def read_bytes(self, path: str) -> bytes:
+        return (self.root / path).read_bytes()
+
+    def delete(self, path: str) -> None:
+        (self.root / path).unlink(missing_ok=True)
+
 
 class GcsStore:
     def __init__(self, bucket_name: str, project: str | None = None):
@@ -47,3 +66,12 @@ class GcsStore:
         # Un objet Cloud Storage n'est visible qu'une fois entièrement écrit : pas de fichier partiel.
         self._bucket.blob(path).upload_from_string(data, content_type=content_type)
         return self.uri(path)
+
+    def list(self, prefix: str) -> list[str]:
+        return sorted(blob.name for blob in self._bucket.list_blobs(prefix=prefix))
+
+    def read_bytes(self, path: str) -> bytes:
+        return self._bucket.blob(path).download_as_bytes()
+
+    def delete(self, path: str) -> None:
+        self._bucket.blob(path).delete()

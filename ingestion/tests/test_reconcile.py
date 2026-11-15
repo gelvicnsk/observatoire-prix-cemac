@@ -21,6 +21,7 @@ def _parquet(rows, ingested_at):
             "unit": [r[3] for r in rows],
             "priceflag": [r[4] for r in rows],
             "pricetype": ["Retail"] * len(rows),
+            "currency": [r[6] if len(r) > 6 else "XAF" for r in rows],
             "price": pa.array([Decimal(r[5]) for r in rows], pa.decimal128(18, 4)),
             "ingested_at": pa.array([ingested_at] * len(rows), pa.timestamp("us", tz="UTC")),
         }
@@ -57,6 +58,11 @@ ROWS = [
     (date(2025, 1, 15), "National Average", "Rice", "KG", "actual", "610"),  # marché exclu
     (date(2025, 2, 15), "Total", "Rice", "KG", "forecast", "700"),  # prévision : écartée
     (date(2025, 2, 15), "Total", "Rice", "50 KG", "aggregate", "32516.6675"),  # 650,33335 -> 650,3334
+    (date(2025, 2, 15), "Total", "Rice", "KG", "actual", "640", "USD"),  # quarantaine : devise inattendue
+    (date(2025, 1, 20), "Total", "Rice", "KG", "actual", "-1"),  # quarantaine : prix négatif
+    (date(2025, 3, 15), "Total", "Rice", "KG", "actual", "700"),  # quarantaine : doublon (deux fois la même clé)
+    (date(2025, 3, 15), "Total", "Rice", "KG", "actual", "710"),
+    (date(2025, 1, 15), "Inconnu", "Rice", "KG", "actual", "500"),  # quarantaine : marché absent
 ]
 
 

@@ -1,8 +1,5 @@
 {{ config(
-    materialized='incremental',
-    incremental_strategy='merge',
-    unique_key='price_monthly_id',
-    on_schema_change='fail',
+    materialized='table',
     partition_by={'field': 'price_month', 'data_type': 'date', 'granularity': 'month'},
     cluster_by=['country_iso3', 'commodity_key'],
     contract={'enforced': true}
@@ -12,20 +9,13 @@
 -- Le détail et le gros ne sont jamais moyennés ensemble (README, section 7). L'unité de base fait partie
 -- du grain : un produit vendu au kg et au litre donne deux lignes, jamais une moyenne des deux.
 --
--- Incrémental : à chaque nouvelle version d'une source, on recalcule entièrement les mois qu'elle touche
--- (le PAM republie tout son historique et peut le corriger). Une ligne retirée par le PAM d'un mois
--- recalculé resterait : un --full-refresh remet tout d'aplomb.
+-- Reconstruite entièrement à chaque run (ADR-012). Une table incrémentale ne recalculait que les mois touchés
+-- par une nouvelle version de source : une ligne partie en quarantaine sans nouvelle version (référentiel
+-- modifié) restait dans les faits. À 240 000 lignes, la reconstruction complète coûte quelques Mo de lecture.
 with source as (
     select *
     from {{ ref('int_wfp__prices_normalized') }}
     where exclusion_reason is null
-    {% if is_incremental() %}
-      and price_month in (
-          select distinct price_month
-          from {{ ref('int_wfp__prices_normalized') }}
-          where ingested_at > (select max(source_ingested_at) from {{ this }})
-      )
-    {% endif %}
 ),
 
 monthly as (
@@ -47,7 +37,8 @@ monthly as (
 ),
 
 fx as (
-    select month, xaf_per_usd from {{ ref('stg_ecb__fx_monthly') }}
+    select month, xaf_per_usd from {{ ref('int_ecb__fx_checked') }}
+    where quarantine_reason is null
 )
 
 select
