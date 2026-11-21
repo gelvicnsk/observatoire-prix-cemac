@@ -372,7 +372,12 @@ make dbt-freshness
 make dbt-docs     # documentation et lineage sur http://localhost:8081
 make reconcile    # étape 6 : prix recalculés en Python depuis bronze, comparés à dbt
 make elementary-report   # étape 8 : rapport Elementary dans data/elementary/report.html
+make run          # tout le pipeline sur dev : ingestion, dbt, rapprochement
 ```
+
+**Pas de backfill mois par mois.** Les sources republient leur historique complet à chaque mise à jour, et
+silver comme gold sont reconstruits depuis bronze à chaque run (ADR-005, ADR-012). Rejouer le passé revient donc
+à relancer le pipeline : `make run` en local, ou une exécution des jobs Cloud Run.
 
 En dev et en prod, rien n'est lancé à la main : le CD déploie à chaque fusion sur `main`, et Cloud Scheduler
 exécute le pipeline chaque mois (section 9).
@@ -384,7 +389,7 @@ Sorties de l'inventaire : `docs/data_profile.md` (versionné), `data/profile/uni
 
 ```
 .
-├── .github/workflows/     # ci.yml, cd.yml, backfill.yml
+├── .github/workflows/     # ci.yml, cd.yml
 ├── infra/                 # Terraform : bootstrap/, modules/, envs/dev, envs/prod
 ├── Dockerfile             # image unique du pipeline (ingestion, dbt, rapprochement, rapport)
 ├── pipeline/              # point d'entrée des Cloud Run Jobs, envoi du rapport Elementary

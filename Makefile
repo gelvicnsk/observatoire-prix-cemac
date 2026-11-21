@@ -8,9 +8,8 @@ DBT_PROJECT_DIR := $(CURDIR)/dbt
 DBT_PROFILES_DIR := $(CURDIR)/dbt
 DBT := dbt
 ENV ?= dev
-MONTH ?= $(shell date -d "last month" +%Y-%m)
 
-.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run backfill seeds-reference seeds-markets seeds-review reconcile elementary-report dbt-deps dbt-build dbt-freshness dbt-docs
+.PHONY: help install lint test profile tf-bootstrap tf-fmt tf-validate tf-init tf-plan tf-apply tf-destroy ingest-local ingest run seeds-reference seeds-markets seeds-review reconcile elementary-report dbt-deps dbt-build dbt-freshness dbt-docs
 
 help:
 	@grep -E '^[a-z-]+:' Makefile | cut -d: -f1
@@ -61,11 +60,7 @@ ingest-local:       ## étape 4 : ingestion en local (data/lake), sans accès GC
 ingest:             ## étape 4 : ingestion vers le bucket raw, meta et les tables externes bronze
 	python -m ingestion.main --target gcp
 
-run:                ## ingestion + dbt pour un mois (MONTH=2026-10)
-	bash scripts/run_local.sh $(MONTH)
-
-backfill:           ## rejouer une période : make backfill FROM=2020-01 TO=2026-10
-	bash scripts/backfill.sh $(FROM) $(TO)
+run: ingest dbt-build reconcile   ## tout le pipeline sur dev, comme le job mensuel (tout l'historique)
 
 seeds-reference:    ## étape 5B : propose les seeds unit_conversion et commodity_mapping (depuis BigQuery)
 	python -m scripts.build_reference_seeds --project $(GCP_PROJECT_ID)
