@@ -76,7 +76,7 @@ models:
               arguments:
                 values: ['champ_obligatoire_vide', 'prix_nul_ou_negatif', 'devise_inattendue', 'type_de_prix_inconnu',
                          'doublon', 'produit_absent_du_referentiel', 'unite_absente_du_referentiel',
-                         'marche_absent_du_referentiel']
+                         'marche_absent_du_referentiel', 'pic_isole_suspect']
 
   - name: int_chirps__rainfall_checked
     description: Pluie CHIRPS avec son motif de quarantaine (null = la ligne passe).

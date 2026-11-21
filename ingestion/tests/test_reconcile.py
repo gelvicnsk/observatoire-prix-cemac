@@ -109,3 +109,34 @@ def test_tolerance_absorbs_a_rounding_step():
     actual = expected.copy()
     actual.loc[0, "price_xaf_per_unit"] = Decimal("575.0001")
     assert compare(expected, actual).ok
+
+
+def _series(prices):
+    """Une série mensuelle de riz au kg sur le marché Total, de janvier à n mois plus tard."""
+    return [(date(2024, m + 1, 15), "Total", "Rice", "KG", "actual", p) for m, p in enumerate(prices)]
+
+
+def _months(rows):
+    files = [("wfp/country=COG/ingest_date=2026-02-01/b.parquet", _parquet(rows, NEW))]
+    return [r["price_month"].month for r in expected_monthly(latest_snapshots(files), SEEDS).to_dict("records")]
+
+
+def test_isolated_spike_goes_to_quarantine():
+    # 425 -> 1360 -> 415 : aller-retour d'un mois, 3,2 fois les deux voisins (cas du sel en Centrafrique)
+    assert _months(_series(["420", "425", "1360", "415", "418"])) == [1, 2, 4, 5]
+
+
+def test_isolated_drop_goes_to_quarantine():
+    assert _months(_series(["600", "40", "610"])) == [1, 3]
+
+
+def test_lasting_rise_and_edges_are_kept():
+    # une hausse qui dure n'est pas un pic ; le dernier mois n'a pas de voisin suivant
+    assert _months(_series(["400", "1200", "1250", "1300"])) == [1, 2, 3, 4]
+    assert _months(_series(["400", "410", "1500"])) == [1, 2, 3]
+    # voisins trop différents (400 et 900) : on ne peut pas parler d'aller-retour
+    assert _months(_series(["400", "2500", "900"])) == [1, 2, 3]
+    # un mois manquant entre les voisins : pas de comparaison
+    rows = _series(["400", "1500", "410"])
+    rows[2] = (date(2024, 4, 15), *rows[2][1:])
+    assert _months(rows) == [1, 2, 4]

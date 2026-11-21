@@ -10,13 +10,13 @@ les normalise et signale les hausses anormales par marché et par produit.
 
 | | |
 |---|---|
-| **Données** | 240 589 prix mensuels, 211 marchés, 5 pays (2003 → 2026) ; 103 produits du PAM ramenés à 100 noms français ; pluie CHIRPS de 5 pays depuis 1981 |
-| **Qualité** | 114 contrôles dbt à chaque exécution, dont 6 tests d'anomalie et de schéma Elementary ; prix recalculés en Python à l'identique (0 écart sur 240 589 lignes) |
+| **Données** | environ 240 000 prix mensuels, 211 marchés, 5 pays (2003 → 2026) ; 103 produits du PAM ramenés à 100 noms français ; pluie CHIRPS de 5 pays depuis 1981 |
+| **Qualité** | 114 contrôles dbt à chaque exécution, dont 6 tests d'anomalie et de schéma Elementary ; prix recalculés en Python à l'identique (0 écart, ligne à ligne) ; pics isolés d'un mois mis en quarantaine (ADR-013) |
 | **Alertes** | hausse anormale = z-score ET hausse sur 1 mois, seuils calibrés sur les données : environ 20 alertes par mois au Tchad, 6 au Cameroun, 3 en Centrafrique |
 | **Plateforme** | GCP en Terraform (dev et prod) ; deux Cloud Run Jobs lancés chaque mois par Cloud Scheduler ; BigQuery bronze → silver → gold |
 | **CI/CD** | 5 contrôles obligatoires sur chaque pull request ; déploiement dev avec test de fumée, puis prod après validation ; aucune clé de service (Workload Identity) |
 | **Quarantaine** | à chaque étape, les données refusées partent dans une branche rouge avec leur motif, et reviennent seules une fois corrigées ; le run continue avec le reste (ADR-012) |
-| **Décisions** | 12 ADR dans [`docs/decisions/`](docs/decisions/) |
+| **Décisions** | 13 ADR dans [`docs/decisions/`](docs/decisions/) |
 
 ```mermaid
 flowchart LR
@@ -105,7 +105,7 @@ qu'un prix dérape sur un marché.
 | 5. dbt silver et gold | 5A staging · 5B référentiels · 5C faits, dimensions, contrat | Terminée |
 | 6. Contrôles et alertes | Contrôles warn / error, rapprochement Python, alertes | Terminée |
 | 7. Déploiement continu | Image, Artifact Registry, Cloud Run Jobs, Scheduler, dev puis prod | Terminée |
-| 8. Tableau de bord et documentation | Elementary, Looker Studio, schémas, décisions | En cours (Elementary et tables du tableau de bord terminés) |
+| 8. Tableau de bord et documentation | Elementary, Data Studio, schémas, décisions | En cours (Elementary, tables du tableau de bord et pics isolés terminés ; reste la publication du rapport) |
 
 ## 3. Périmètre : ce que les données contiennent vraiment
 
@@ -280,6 +280,7 @@ Chaque règle est une table de correspondance versionnée (seed dbt), jamais une
 | Ligne invalide (prix négatif, devise, doublon) ou unité, produit, marché absent d'un référentiel | warn | Ligne en quarantaine avec son motif (`quarantine.qrt_*`) ; elle revient seule une fois corrigée (ADR-012) |
 | Fichier source refusé (colonnes attendues absentes) | warn | Fichier en quarantaine (`raw/_quarantine/`), rejoué au run suivant (ADR-012) |
 | Prix hors d'un facteur 10 de la médiane du produit dans le pays | warn | Ligne marquée suspecte, exclue des alertes |
+| Pic isolé d'un mois : au moins 2,5 fois les deux mois voisins, qui se ressemblent (ex. sel en Centrafrique, décembre 2025) | warn | Ligne en quarantaine, motif `pic_isole_suspect` (ADR-013) |
 | Aucun nouveau relevé depuis 3 mois pour un pays actif | warn | Signalé dans le tableau de bord |
 | Prix moyen recalculé en Python égal à celui de dbt | error | Le run s'arrête |
 
