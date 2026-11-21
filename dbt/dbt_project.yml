@@ -21,6 +21,10 @@ vars:
   alert_z_strong: 3                 # alerte forte : z-score >= 3 ...
   alert_change_1m_strong_pct: 40    # ... et hausse sur 1 mois >= 40 %
   freshness_stale_months: 3         # pays actif sans nouveau relevé depuis 3 mois : signalé
+  # Pic isolé d'un mois (ADR-013) : prix au moins 2,5 fois plus haut (ou plus bas) que le mois d'avant et
+  # que le mois d'après, ces deux voisins ne s'écartant pas de plus de 50 % : ligne en quarantaine.
+  spike_factor: 2.5
+  spike_neighbours_max_ratio: 1.5
 
 # Elementary remplace la matérialisation des tests pour en garder les résultats : dbt 1.8+ exige de
 # l'autoriser explicitement.

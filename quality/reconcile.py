@@ -6,7 +6,7 @@ pays, comme le prévoit l'ADR-005) et des trois référentiels versionnés (dbt/
 règles, écrites une seconde fois :
 
 - lignes en quarantaine (ADR-012) : champ obligatoire vide, prix nul ou négatif, devise autre que XAF,
-  type de prix inconnu, doublon, ou absente d'un référentiel ;
+  type de prix inconnu, doublon, absente d'un référentiel, ou pic isolé d'un mois (ADR-013) ;
 - lignes écartées : marché exclu, produit hors panier, unité exclue ou sans poids, prévision du PAM ;
 - prix au kg ou au litre = prix / facteur de l'unité, arrondi à 4 décimales ;
 - une ligne par pays, marché, produit (nom français), type de prix, unité de base et mois : moyenne arrondie.
@@ -37,6 +37,10 @@ import pyarrow.parquet as pq
 KEY = ["country_iso3", "market_name", "commodity_name_fr", "price_type", "base_unit", "price_month"]
 FOUR_PLACES = Decimal("0.0001")
 DEFAULT_TOLERANCE = Decimal("0.0001")
+# mêmes valeurs que les variables spike_* de dbt_project.yml (ADR-013)
+SPIKE_FACTOR = Decimal("2.5")
+SPIKE_NEIGHBOURS_MAX_RATIO = Decimal("1.5")
+SERIES = ["country_iso3", "market_name", "commodity_name_fr", "price_type", "base_unit"]
 
 
 def _round4(value: Decimal) -> Decimal:
@@ -125,26 +129,59 @@ def expected_monthly(prices: pd.DataFrame, seeds: dict[str, pd.DataFrame]) -> pd
         .merge(units, left_on="unit", right_on="unit_raw", how="inner")
         .merge(markets, on=["country_iso3", "market_name"], how="inner")
     )
+    frame = frame.rename(columns={"name_fr": "commodity_name_fr"})
+    frame["price_month"] = [date(d.year, d.month, 1) for d in pd.to_datetime(frame["date"])]
     flag = frame["priceflag"].fillna("").str.lower()
+    candidate = (frame["status"] == "converti") & ~flag.str.contains("forecast")
+    frame["price_xaf_per_unit"] = [
+        _round4(Decimal(price) / Decimal(factor)) if is_candidate else None
+        for price, factor, is_candidate in zip(frame["price"], frame["factor_to_base"], candidate, strict=True)
+    ]
+    spikes = isolated_spikes(frame[candidate])
+    is_spike = pd.Series(
+        [tuple(row) in spikes for row in frame[[*SERIES, "price_month"]].itertuples(index=False)],
+        index=frame.index,
+        dtype=bool,
+    )
     kept = frame[
         (frame["market_status"] != "exclu")
         & (frame["include_in_index"] == "true")
-        & (frame["status"] == "converti")
-        & ~flag.str.contains("forecast")
+        & candidate
+        & ~(candidate & is_spike)
     ].copy()
-
-    kept["price_xaf_per_unit"] = [
-        _round4(Decimal(price) / Decimal(factor))
-        for price, factor in zip(kept["price"], kept["factor_to_base"], strict=True)
-    ]
-    kept["price_month"] = [date(d.year, d.month, 1) for d in pd.to_datetime(kept["date"])]
-    kept = kept.rename(columns={"name_fr": "commodity_name_fr"})
 
     rows = []
     for key, group in kept.groupby(KEY, sort=True):
         values = list(group["price_xaf_per_unit"])
         rows.append((*key, len(values), _round4(sum(values, Decimal(0)) / len(values))))
     return pd.DataFrame(rows, columns=[*KEY, "n_observations", "price_xaf_per_unit"])
+
+
+def _next_month(month: date) -> date:
+    return date(month.year + month.month // 12, month.month % 12 + 1, 1)
+
+
+def isolated_spikes(candidates: pd.DataFrame) -> set[tuple]:
+    """Mois en pic isolé (ADR-013), comme dans int_wfp__prices_checked : (série..., mois)."""
+    monthly: dict[tuple, dict[date, Decimal]] = {}
+    for key, group in candidates.groupby([*SERIES, "price_month"], sort=True):
+        values = list(group["price_xaf_per_unit"])
+        monthly.setdefault(tuple(key[:-1]), {})[key[-1]] = _round4(sum(values, Decimal(0)) / len(values))
+
+    spikes: set[tuple] = set()
+    for series, prices in monthly.items():
+        months = sorted(prices)
+        for prev_month, month, next_month in zip(months, months[1:], months[2:], strict=False):
+            if _next_month(prev_month) != month or _next_month(month) != next_month:
+                continue
+            prev, value, nxt = prices[prev_month], prices[month], prices[next_month]
+            if max(prev, nxt) > SPIKE_NEIGHBOURS_MAX_RATIO * min(prev, nxt):
+                continue
+            up = value >= SPIKE_FACTOR * prev and value >= SPIKE_FACTOR * nxt
+            down = value * SPIKE_FACTOR <= prev and value * SPIKE_FACTOR <= nxt
+            if up or down:
+                spikes.add((*series, month))
+    return spikes
 
 
 # --------------------------------------------------------------------------------------------------
